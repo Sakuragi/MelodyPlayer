@@ -1,4 +1,4 @@
-package com.jim.AudioPlayerDemo.player;
+package com.jim.MelodyPlayer.player;
 
 import android.app.Service;
 import android.content.Intent;
@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.jim.AudioPlayerDemo.IMyAidlInterface;
+import com.jim.MelodyPlayer.IMyAidlInterface;
 
 import java.io.IOException;
 

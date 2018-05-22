@@ -1,4 +1,4 @@
-package com.jim.AudioPlayerDemo.app;
+package com.jim.MelodyPlayer.app;
 
 import android.app.Application;
 

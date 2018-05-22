@@ -1,11 +1,11 @@
-package com.jim.AudioPlayerDemo.player;
+package com.jim.MelodyPlayer.player;
 
 import android.text.TextUtils;
 import android.util.Log;
 
 
-import com.jim.AudioPlayerDemo.utils.LogUtil;
-import com.jim.AudioPlayerDemo.utils.Util;
+import com.jim.MelodyPlayer.utils.LogUtil;
+import com.jim.MelodyPlayer.utils.Util;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

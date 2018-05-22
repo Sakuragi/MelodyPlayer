@@ -1,4 +1,4 @@
-package com.jim.AudioPlayerDemo;
+package com.jim.MelodyPlayer;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

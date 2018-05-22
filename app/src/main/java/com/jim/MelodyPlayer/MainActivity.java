@@ -1,6 +1,5 @@
-package com.jim.AudioPlayerDemo;
+package com.jim.MelodyPlayer;
 
-import android.content.res.AssetManager;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,26 +11,20 @@ import android.widget.Button;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.jim.AudioPlayerDemo.base.BaseViewHolder;
-import com.jim.AudioPlayerDemo.base.CommonAdapter;
-import com.jim.AudioPlayerDemo.base.FM;
-import com.jim.AudioPlayerDemo.player.AudioPlayer;
+import com.jim.MelodyPlayer.base.BaseViewHolder;
+import com.jim.MelodyPlayer.base.CommonAdapter;
+import com.jim.MelodyPlayer.base.FM;
+import com.jim.MelodyPlayer.player.AudioPlayer;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.lang.reflect.Type;
-import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 

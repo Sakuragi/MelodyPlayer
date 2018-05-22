@@ -1,8 +1,7 @@
-package com.jim.AudioPlayerDemo.player;
+package com.jim.MelodyPlayer.player;
 
 import android.media.MediaPlayer;
 import android.util.Log;
-import android.widget.TextView;
 
 import java.io.IOException;
 
