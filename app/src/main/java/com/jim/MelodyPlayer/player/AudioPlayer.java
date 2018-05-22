@@ -3,6 +3,8 @@ package com.jim.MelodyPlayer.player;
 import android.media.MediaPlayer;
 import android.util.Log;
 
+import com.jim.MelodyPlayer.MediaProxy;
+
 import java.io.IOException;
 
 /**

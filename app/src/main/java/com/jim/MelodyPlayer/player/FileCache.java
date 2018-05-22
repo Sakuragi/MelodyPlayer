@@ -2,8 +2,9 @@ package com.jim.MelodyPlayer.player;
 
 import android.util.Base64;
 
-import com.jim.videoplayerdemo.utils.LogUtil;
-import com.jim.videoplayerdemo.utils.Util;
+
+import com.jim.MelodyPlayer.utils.LogUtil;
+import com.jim.MelodyPlayer.utils.Util;
 
 import java.io.File;
 import java.io.FileNotFoundException;

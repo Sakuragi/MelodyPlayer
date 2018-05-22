@@ -3,8 +3,9 @@ package com.jim.MelodyPlayer.player;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.jim.videoplayerdemo.utils.LogUtil;
-import com.jim.videoplayerdemo.utils.Util;
+
+import com.jim.MelodyPlayer.utils.LogUtil;
+import com.jim.MelodyPlayer.utils.Util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

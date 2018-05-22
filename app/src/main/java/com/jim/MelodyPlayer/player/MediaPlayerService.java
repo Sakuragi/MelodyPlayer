@@ -19,6 +19,9 @@ public class MediaPlayerService extends Service {
     private IBinder mIBinder=new AudioPlayerServiceStub(this);
 
 
+
+    public void openSource(){}
+
     public void play(){
 
     }
@@ -26,7 +29,7 @@ public class MediaPlayerService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mIBinder;
     }
 
 

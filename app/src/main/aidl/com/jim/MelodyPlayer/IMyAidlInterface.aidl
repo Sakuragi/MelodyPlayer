@@ -1,5 +1,5 @@
 // IMyAidlInterface.aidl
-package com.jim.AudioPlayerDemo;
+package com.jim.MelodyPlayer;
 
 // Declare any non-default types here with import statements
 
