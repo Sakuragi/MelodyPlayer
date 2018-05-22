@@ -1,0 +1,54 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:padding="2dp">
+
+    <ImageView
+        android:id="@+id/sdv_head"
+        android:layout_width="112dp"
+        android:layout_height="70dp"
+        android:layout_centerVertical="true"
+        android:contentDescription="@null" />
+
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/sdv_head"
+        android:padding="5dp"
+        android:text=""
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/tv_anchor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_title"
+        android:layout_toRightOf="@+id/sdv_head"
+        android:drawablePadding="3dp"
+        android:padding="5dp"
+        android:text="主播："
+        android:textColor="@android:color/black" />
+
+    <TextView
+        android:id="@+id/tv_listen_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_title"
+        android:layout_toRightOf="@+id/tv_anchor"
+        android:drawablePadding="3dp"
+        android:padding="5dp"
+        android:text="收听：0"
+        android:textColor="@android:color/black" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@android:color/darker_gray"
+        android:layout_alignParentBottom="true"/>
+
+
+
+</RelativeLayout>
