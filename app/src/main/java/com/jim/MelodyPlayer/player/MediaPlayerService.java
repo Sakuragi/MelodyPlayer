@@ -17,10 +17,17 @@ import java.lang.ref.WeakReference;
 public class MediaPlayerService extends Service {
 
     private IBinder mIBinder=new AudioPlayerServiceStub(this);
+    private MediaProxyServer mProxyServer;
 
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mProxyServer=new MediaProxyServer();
+    }
 
+    public void openSource(String url){
 
-    public void openSource(){}
+    }
 
     public void play(){
 

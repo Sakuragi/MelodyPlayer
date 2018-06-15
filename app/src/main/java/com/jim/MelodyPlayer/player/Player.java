@@ -1,15 +1,14 @@
 package com.jim.MelodyPlayer.player;
 
 /**
- * Created by Jim on 2018/5/25 0025.
+ * Created by Jim on 2018/5/27.
  */
-
 public interface Player {
+    void open(String url);
     void play();
     void playOrPause();
     void seek(int position);
-    void open(String url);
     void stop();
-    void release();
-    long getDurtion();
+    void destroy();
+    long getDuration();
 }

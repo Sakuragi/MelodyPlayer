@@ -1,11 +1,21 @@
 package com.jim.MelodyPlayer.player;
 
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.widget.VideoView;
 
 import com.jim.MelodyPlayer.MediaProxy;
+import com.jim.MelodyPlayer.utils.LogUtil;
 
 import java.io.IOException;
+import java.util.IllegalFormatCodePointException;
+
+import static android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+import static com.jim.MelodyPlayer.MainActivity.INIT_SEEK_BAR;
 
 /**
  * Created by Jim on 2018/1/29 0029.
@@ -14,16 +24,26 @@ import java.io.IOException;
 public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         MediaPlayer.OnErrorListener, Player,
         MediaPlayer.OnPreparedListener {
-
+    private static final int STATE_ERROR = -1;
     private static final int STATE_IDLE = 0;
     private static final int STATE_PREPARING = 1;
-    private static final int STATE_PLAYING = 2;
-    
-    private int currentState=0;
+    private static final int STATE_PREPARED = 2;
+    private static final int STATE_PLAYING = 3;
+    private static final int STATE_PAUSED = 4;
+    private static final int STATE_PLAYBACK_COMPLETED = 5;
 
+    private final String TAG = AudioPlayer.class.getSimpleName();
     private MediaPlayer mMediaPlayer;
+    private MediaProxyServer mMediaProxy;
+    private int mCurrentState = STATE_IDLE;
+    private Handler uiHandler;
+    private AudioManager mAudioManager;
 
-
+    public AudioPlayer() {
+        mMediaProxy = new MediaProxyServer();
+        mMediaProxy.init();
+        mMediaPlayer = new MediaPlayer();
+    }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
@@ -37,46 +57,93 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     @Override
     public void onPrepared(MediaPlayer mp) {
-
-    }
-
-    @Override
-    public void play() {
-
-    }
-
-    @Override
-    public void playOrPause() {
-
-    }
-
-    @Override
-    public void seek(int position) {
-
+        if (mCurrentState == STATE_PREPARING) {
+            mCurrentState = STATE_PREPARED;
+            Message msg=uiHandler.obtainMessage();
+            msg.what=INIT_SEEK_BAR;
+            msg.arg1= (int) getDuration();
+            play();
+        }
     }
 
     @Override
     public void open(String url) {
-        mMediaPlayer=new MediaPlayer();
+        mMediaPlayer.reset();
+        mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setOnCompletionListener(this);
         mMediaPlayer.setOnErrorListener(this);
-        mMediaPlayer.setOnPreparedListener(this);
-        mMediaPlayer.prepareAsync();
-        currentState=STATE_PREPARING;
+        try {
+            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.setOnPreparedListener(this);
+            mMediaPlayer.prepareAsync();
+            mCurrentState = STATE_PREPARING;
+        } catch (IOException e) {
+            LogUtil.e("open file error: "+e.toString());
+        }
+    }
+
+    @Override
+    public void play() {
+        if (!mMediaPlayer.isPlaying() &&!isCanNotPlay()) {
+            int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
+                    AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            if (status==AUDIOFOCUS_REQUEST_GRANTED){
+                mMediaPlayer.start();
+                mCurrentState = STATE_PLAYING;
+            }
+        }
+    }
+
+    @Override
+    public void playOrPause() {
+        if (isCanNotPlay()){
+            return;
+        }
+        if (mMediaPlayer.isPlaying()){
+            mMediaPlayer.pause();
+            mCurrentState=STATE_PAUSED;
+        }else if (!mMediaPlayer.isPlaying()){
+            play();
+        }
+    }
+
+    @Override
+    public void seek(int position) {
+        if (!isCanNotPlay()){
+            mMediaPlayer.seekTo(position);
+        }
     }
 
     @Override
     public void stop() {
-
+        if (mCurrentState!=STATE_IDLE){
+            mMediaPlayer.stop();
+            mCurrentState=STATE_IDLE;
+        }
     }
 
     @Override
-    public void release() {
-
+    public void destroy() {
+        if (mMediaPlayer!=null){
+            mMediaPlayer.release();
+        }
     }
 
     @Override
-    public long getDurtion() {
-        return 0;
+    public long getDuration() {
+        return mMediaPlayer.getDuration();
     }
+
+    private boolean isCanNotPlay(){
+        return mCurrentState==STATE_IDLE||
+                mCurrentState==STATE_ERROR||
+                mCurrentState==STATE_PREPARING;
+    }
+
+    private final AudioManager.OnAudioFocusChangeListener mAudioFocusListener = new AudioManager.OnAudioFocusChangeListener() {
+
+        @Override
+        public void onAudioFocusChange(final int focusChange) {
+        }
+    };
 }
