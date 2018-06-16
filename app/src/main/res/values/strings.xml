@@ -1,5 +1,5 @@
 <resources>
-    <string name="mp.app.name">音乐播放器</string>
+    <string name="app_name">音乐播放器</string>
 
     <string name="mp.list.layoutManager.linear">LinearLayoutManager</string>
 
@@ -83,4 +83,10 @@
     <string name="mp.menu.play_now">立即播放</string>
     <string name="mp.menu.rename">重命名</string>
     <string name="mp.menu.delete">删除</string>
+
+    <!--font-->
+    <string name="mp.font.roboto.regular">fonts/Roboto-Regular.ttf</string>
+    <string name="mp.font.roboto.medium">fonts/Roboto-Medium.ttf</string>
+    <string name="mp.font.roboto.thin">fonts/Roboto-Thin.ttf</string>
+    <string name="mp.font.roboto.monospace.regular">fonts/Roboto-Monospace-Regular.ttf</string>
 </resources>

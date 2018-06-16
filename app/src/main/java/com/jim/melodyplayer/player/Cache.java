@@ -1,7 +1,7 @@
-package com.jim.MelodyPlayer.player;
+package com.jim.melodyplayer.player;
 
 
-import com.jim.MelodyPlayer.app.App;
+import com.jim.melodyplayer.app.App;
 
 import java.io.IOException;
 

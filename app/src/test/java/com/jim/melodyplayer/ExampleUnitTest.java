@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer;
+package com.jim.melodyplayer;
 
 import org.junit.Test;
 

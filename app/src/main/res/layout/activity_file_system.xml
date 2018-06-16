@@ -26,7 +26,6 @@
         />
 
     <TextView
-        style="@style/MP.Theme.TextAppearance.List.Empty"
         android:text="@string/mp.local_files.file_system.empty"
         tools:visibility="visible"
         />

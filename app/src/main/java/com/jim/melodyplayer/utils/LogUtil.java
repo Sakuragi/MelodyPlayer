@@ -1,8 +1,8 @@
-package com.jim.MelodyPlayer.utils;
+package com.jim.melodyplayer.utils;
 
 import android.util.Log;
 
-import com.jim.MelodyPlayer.BuildConfig;
+import com.jim.melodyplayer.BuildConfig;
 
 
 /**

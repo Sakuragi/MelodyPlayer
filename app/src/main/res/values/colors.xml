@@ -5,6 +5,9 @@
     <color name="transparent">#00000000</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="grey">#DEDEDE</color>
+    <color name="red">#EE0000</color>
+    <color name="red_30p">#EE2C2C</color>
 
     <!-- Theme - Dark Blue -->
     <color name="mp.theme.dark_blue.background">#3C5F78</color>

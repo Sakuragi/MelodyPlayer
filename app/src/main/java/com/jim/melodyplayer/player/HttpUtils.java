@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer.player;
+package com.jim.melodyplayer.player;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

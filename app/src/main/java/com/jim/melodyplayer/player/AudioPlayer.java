@@ -1,21 +1,16 @@
-package com.jim.MelodyPlayer.player;
+package com.jim.melodyplayer.player;
 
-import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
-import android.widget.VideoView;
 
-import com.jim.MelodyPlayer.MediaProxy;
-import com.jim.MelodyPlayer.utils.LogUtil;
+import com.jim.melodyplayer.utils.LogUtil;
 
 import java.io.IOException;
-import java.util.IllegalFormatCodePointException;
 
 import static android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-import static com.jim.MelodyPlayer.MainActivity.INIT_SEEK_BAR;
+import static com.jim.melodyplayer.ui.activities.MainActivity.INIT_SEEK_BAR;
 
 /**
  * Created by Jim on 2018/1/29 0029.

@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer.base;
+package com.jim.melodyplayer.base;
 
 import android.content.Context;
 import android.support.v4.util.SparseArrayCompat;

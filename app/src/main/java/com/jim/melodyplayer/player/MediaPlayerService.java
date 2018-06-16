@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer.player;
+package com.jim.melodyplayer.player;
 
 import android.app.Service;
 import android.content.Intent;
@@ -6,7 +6,7 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
 
-import com.jim.MelodyPlayer.IMyAidlInterface;
+import com.jim.melodyplayer.IMyAidlInterface;
 
 import java.lang.ref.WeakReference;
 

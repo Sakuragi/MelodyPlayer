@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer.utils;
+package com.jim.melodyplayer.utils;
 
 import java.io.Closeable;
 import java.io.IOException;

@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer.player;
+package com.jim.melodyplayer.player;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer.player;
+package com.jim.melodyplayer.player;
 
 /**
  * Created by Jim on 2018/5/4.

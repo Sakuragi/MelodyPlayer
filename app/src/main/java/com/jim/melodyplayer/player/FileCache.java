@@ -1,10 +1,10 @@
-package com.jim.MelodyPlayer.player;
+package com.jim.melodyplayer.player;
 
 import android.util.Base64;
 
 
-import com.jim.MelodyPlayer.utils.LogUtil;
-import com.jim.MelodyPlayer.utils.Util;
+import com.jim.melodyplayer.utils.LogUtil;
+import com.jim.melodyplayer.utils.Util;
 
 import java.io.File;
 import java.io.FileNotFoundException;

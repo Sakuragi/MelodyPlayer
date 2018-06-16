@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer.base;
+package com.jim.melodyplayer.base;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

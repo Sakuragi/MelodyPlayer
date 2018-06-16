@@ -1,4 +1,4 @@
-package com.jim.MelodyPlayer.base;
+package com.jim.melodyplayer.base;
 
 public class FM {
     public int id;
