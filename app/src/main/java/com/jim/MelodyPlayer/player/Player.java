@@ -3,7 +3,6 @@ package com.jim.MelodyPlayer.player;
 /**
  * Created by Jim on 2018/5/27.
  */
-
 public interface Player {
     void open(String url);
     void play();

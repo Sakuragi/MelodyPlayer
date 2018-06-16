@@ -24,7 +24,6 @@ import static com.jim.MelodyPlayer.MainActivity.INIT_SEEK_BAR;
 public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         MediaPlayer.OnErrorListener, Player,
         MediaPlayer.OnPreparedListener {
-
     private static final int STATE_ERROR = -1;
     private static final int STATE_IDLE = 0;
     private static final int STATE_PREPARING = 1;

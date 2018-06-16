@@ -72,32 +72,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        initViews();
-        initEvents();
-    }
 
-    private void initEvents() {
-        ivPlay.setOnClickListener(this);
-        ivNext.setOnClickListener(this);
-        ivPre.setOnClickListener(this);
-        mSeekBar.setOnSeekBarChangeListener(this);
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.iv_play:
-                if (mAudioPlayer==null){
-                    mAudioPlayer=new AudioPlayer();
-                }
-                mAudioPlayer.open(testUrl);
-                mAudioPlayer.playOrPause();
-                break;
-            case R.id.iv_next:
-                break;
-            case R.id.iv_prev:
-                break;
-        }
+
     }
 
     @Override
@@ -115,43 +95,3 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 }
-
-//
-//    private void initView() {
-//        datas=new ArrayList<>();
-//        InputStream inputStream=null;
-//        try {
-//            inputStream=getAssets().open("data.json");
-//            byte[] buffer=new byte[2048];
-//            StringBuilder builder=new StringBuilder();
-//            while (inputStream.read(buffer)>0){
-//                builder.append(new String(buffer));
-//            }
-//            Type listType = new TypeToken<List<FM>>(){}.getType();
-//            JSONObject jsonObject=new JSONObject(builder.toString());
-//            JSONArray array=jsonObject.getJSONArray("data");
-//            Gson gson=new Gson();
-//            datas=gson.fromJson(new StringReader(array.toString()),listType);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }finally {
-//            try {
-//                inputStream.close();
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//        Log.d("TAG",datas.toString());
-//        mAdapter=new CommonAdapter<FM>(this,R.layout.item_fm_list,datas) {
-//            @Override
-//            public void convert(BaseViewHolder holder, int position, FM data, int dataState) {
-//                holder.setImageWithUrl(R.id.sdv_head,data.image_url);
-//                holder.setText(R.id.tv_title,data.name);
-//                holder.setText(R.id.tv_anchor,data.author);
-//                holder.setText(R.id.tv_listen_num,data.hits);
-//            }
-//        };
-////        mRecyclerView=findViewById(R.id.rcv);
-//        mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-//        mRecyclerView.setAdapter(mAdapter);
-//    }
