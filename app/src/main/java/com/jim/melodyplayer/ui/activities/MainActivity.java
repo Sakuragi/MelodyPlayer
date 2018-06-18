@@ -9,9 +9,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -53,9 +55,11 @@ public class MainActivity extends AppCompatActivity {
     Toolbar mToolbar;
     @BindView(R.id.view_pager)
     ViewPager viewPager;
-    @BindViews({R.id.radio_button_play_list, R.id.radio_button_music, R.id.radio_button_local_files, R.id.radio_button_settings})
+    @BindViews({R.id.radio_button_play_list, R.id.radio_button_music_lib, R.id.radio_button_local_files, R.id.radio_button_settings})
     List<RadioButton> radioButtons;
-    String[] mTitles = {"播放列表", "音乐", "本地音乐", "设置"};
+    @BindView(R.id.radio_group_controls)
+    RadioGroup mRadioGroup;
+    String[] mTitles = {"播放列表", "音乐库", "本地音乐", "设置"};
 
 
     @Override
@@ -65,11 +69,13 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         setSupportActionBar(mToolbar);
         initViewPagers();
+
     }
 
     private void initViewPagers() {
         final Fragment[] fragments = {new PlayListFragment(),new MusicFragment(),new LocalFragment(),new SettingFragment()};
         viewPager.setOffscreenPageLimit(fragments.length - 1);
+        viewPager.setPageMargin(getResources().getDimensionPixelSize(R.dimen.mp_margin_large));
         viewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
             public Fragment getItem(int position) {
@@ -106,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
         radioButtons.get(2).setChecked(true);
     }
 
-    @OnCheckedChanged({R.id.radio_button_play_list, R.id.radio_button_music, R.id.radio_button_local_files, R.id.radio_button_settings})
+    @OnCheckedChanged({R.id.radio_button_play_list, R.id.radio_button_music_lib, R.id.radio_button_local_files, R.id.radio_button_settings})
     public void onRadioButtonChecked(RadioButton button, boolean isChecked) {
         if (isChecked) {
             onItemChecked(radioButtons.indexOf(button));
