@@ -191,4 +191,5 @@
     <style name="MP.Theme.TextAppearance.SmallPopupMenu" parent="TextAppearance.AppCompat.Widget.PopupMenu.Small">
         <item name="android:textColor">@color/mp.theme.dark_blue.colorPrimary</item>
     </style>
+    <style name="AppTheme.Text" parent="TextAppearance.AppCompat" />
 </resources>

@@ -20,6 +20,7 @@
     <dimen name="mp.text.list.title">14sp</dimen>
     <dimen name="mp.text.list.hint">12sp</dimen>
     <dimen name="mp.text.hint">12sp</dimen>
+    <dimen name="text_size_common">16sp</dimen>
 
     <dimen name="mp.toolbar.paddingTop">0dp</dimen>
 
@@ -33,6 +34,7 @@
     <dimen name="mp.music.seekBar.marginTop">50dp</dimen>
     <dimen name="mp.music.playControls.marginTop">24dp</dimen>
     <dimen name="mp.music.playControls.marginBottom">8dp</dimen>
+    <dimen name="play_bar_height">57dp</dimen>
 
     <!-- CharacterView -->
     <dimen name="mp.characterView.padding">6dp</dimen>
