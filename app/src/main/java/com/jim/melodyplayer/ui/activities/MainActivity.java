@@ -42,14 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private String testUrl = "https://video.ydlcdn.com/2018/01/25/786b3e1640569ac1379505fdb0f8d1a8.mp3";
     public static final int INIT_SEEK_BAR = 1;
     public static final int UPDATE_SEEK_BAR = 2;
-
-    private TextView mTvCurrentTime;
-    private SeekBar mSeekBar;
-    private TextView mTotalTime;
-    private ImageView ivPre;
-    private ImageView ivNext;
-    private ImageView ivPlay;
-    private AudioPlayer mAudioPlayer = new AudioPlayer();
+    private final int DEFAULT_INDEX=1;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -109,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        radioButtons.get(2).setChecked(true);
+        radioButtons.get(DEFAULT_INDEX).setChecked(true);
     }
 
     @OnCheckedChanged({R.id.radio_button_play_list, R.id.radio_button_music_lib, R.id.radio_button_local_files, R.id.radio_button_settings})

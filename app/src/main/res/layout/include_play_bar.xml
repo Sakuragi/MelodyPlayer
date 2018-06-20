@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/fl_play_bar"
-    android:layout_width="match_parent"
-    android:layout_height="@dimen/play_bar_height">
+             android:id="@+id/fl_play_bar"
+             android:layout_width="match_parent"
+             android:layout_height="@dimen/play_bar_height"
+             android:background="#3C5F88">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
             android:layout_height="45dp"
             android:contentDescription="@null"
             android:scaleType="fitXY"
-            android:src="@drawable/default_cover" />
+            android:src="@drawable/default_cover"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -37,7 +38,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text="无音乐"
-                android:textSize="@dimen/text_size_common" />
+                android:textSize="@dimen/text_size_common"/>
 
             <TextView
                 android:id="@+id/tv_play_bar_artist"
@@ -46,7 +47,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:textColor="@color/grey"
-                android:textSize="12sp" />
+                android:textSize="12sp"/>
         </LinearLayout>
 
         <ImageView
@@ -54,21 +55,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@null"
-            android:src="@drawable/play_bar_btn_play_pause_selector" />
+            android:src="@drawable/play_bar_btn_play_pause_selector"/>
 
         <ImageView
             android:id="@+id/iv_play_bar_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@null"
-            android:src="@drawable/ic_play_bar_btn_next" />
+            android:src="@drawable/ic_play_bar_btn_next"/>
 
         <ImageView
             android:id="@+id/v_play_bar_playlist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:contentDescription="@null"
-            android:src="@drawable/ic_play_bar_btn_playlist" />
+            android:src="@drawable/ic_play_bar_btn_playlist"/>
     </LinearLayout>
 
     <ProgressBar
@@ -77,5 +78,5 @@
         android:layout_width="match_parent"
         android:layout_height="2dp"
         android:layout_gravity="bottom"
-        android:progressDrawable="@drawable/progress_bar_style" />
+        android:progressDrawable="@drawable/progress_bar_style"/>
 </FrameLayout>
