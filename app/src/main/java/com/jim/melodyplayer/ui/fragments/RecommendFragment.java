@@ -15,6 +15,7 @@ import com.jim.melodyplayer.R;
 import com.jim.melodyplayer.base.BaseRecyclerView;
 import com.jim.melodyplayer.base.BaseViewHolder;
 import com.jim.melodyplayer.base.CommonAdapter;
+import com.jim.melodyplayer.ui.LoodView;
 import com.jim.melodyplayer.ui.widget.LoopView;
 
 import butterknife.BindView;
@@ -31,7 +32,7 @@ public class RecommendFragment extends Fragment {
     BaseRecyclerView mBaseRcv;
     Unbinder unbinder;
 
-    private LoopView mLoopView;
+    private LoodView mLoopView;
     private CommonAdapter mCommonAdapter;
 
     @Nullable
@@ -49,11 +50,6 @@ public class RecommendFragment extends Fragment {
             public void convert(BaseViewHolder holder, int position, Object data, int dataState) {
 
             }
-
-            @Override
-            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-
-            }
         };
         mBaseRcv.setLayoutManager(new LinearLayoutManager(getActivity()));
         initHeaderViews();
@@ -61,8 +57,10 @@ public class RecommendFragment extends Fragment {
     }
 
     private void initHeaderViews() {
-        mLoopView=new LoopView(getActivity());
+        mLoopView=new LoodView(getActivity());
         View view=LayoutInflater.from(getActivity()).inflate(R.layout.item_recommand_guide,mBaseRcv,false);
+        if(mLoopView != null) mLoopView.requestFocus();
+//        mLoopView.upDateUI();
         mCommonAdapter.addHeaderView(mLoopView);
         mCommonAdapter.addHeaderView(view);
     }
