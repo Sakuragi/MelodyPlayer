@@ -15,8 +15,12 @@ import com.jim.melodyplayer.R;
 import com.jim.melodyplayer.base.BaseRecyclerView;
 import com.jim.melodyplayer.base.BaseViewHolder;
 import com.jim.melodyplayer.base.CommonAdapter;
+import com.jim.melodyplayer.model.Banner;
 import com.jim.melodyplayer.ui.LoodView;
 import com.jim.melodyplayer.ui.widget.LoopView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -57,12 +61,21 @@ public class RecommendFragment extends Fragment {
     }
 
     private void initHeaderViews() {
-        mLoopView=new LoodView(getActivity());
         View view=LayoutInflater.from(getActivity()).inflate(R.layout.item_recommand_guide,mBaseRcv,false);
+        mLoopView=view.findViewById(R.id.loop_view);
         if(mLoopView != null) mLoopView.requestFocus();
-//        mLoopView.upDateUI();
-        mCommonAdapter.addHeaderView(mLoopView);
+        mLoopView.upDateUI(createBannerDatas());
         mCommonAdapter.addHeaderView(view);
+    }
+
+    private List<Banner> createBannerDatas() {
+        List<Banner> banners=new ArrayList<>();
+        for (int i=0;i<=6;i++){
+            Banner banner=new Banner();
+            banner.imag_url="http://img2.imgtn.bdimg.com/it/u=3588772980,2454248748&fm=27&gp=0.jpg";
+            banners.add(banner);
+        }
+        return banners;
     }
 
     @Override

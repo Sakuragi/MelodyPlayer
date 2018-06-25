@@ -43,6 +43,7 @@ public class MusicFragment extends Fragment {
             mViewpager.setOffscreenPageLimit(2);
         }
         mTabs.setupWithViewPager(mViewpager);
+        mTabs.setTabTextColors(R.color.black,R.color.black);
         return rootView;
     }
 
@@ -51,7 +52,7 @@ public class MusicFragment extends Fragment {
         RecommendFragment recommendFragment = new RecommendFragment();
 //        recommendFragment.setChanger(this);
         adapter.addFragment(recommendFragment, "推荐");
-        adapter.addFragment(new AllPlaylistFragment(), "歌单");
+        adapter.addFragment(new AllPlaylistFragment(), "专辑");
         //  adapter.addFragment(new NetFragment(), "主播电台");
         adapter.addFragment(new RankingFragment(), "排行榜");
 

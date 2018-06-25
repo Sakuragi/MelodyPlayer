@@ -39,8 +39,8 @@ public class LoodView extends FrameLayout {
     private int[] imageResIds;
     private FPagerAdapter fPagerAdapter;
     private ArrayList<String> imageNet = new ArrayList<>();
-    private List<ImageView> imageViewList;
-    private List<View> dotViewList;
+    private List<ImageView> imageViewList=new ArrayList<>();
+    private List<View> dotViewList=new ArrayList<>();
     private ViewPager viewPager;
     private boolean isFromCache = true;
     private Context mContext;
