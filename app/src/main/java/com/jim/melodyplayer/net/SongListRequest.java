@@ -5,11 +5,13 @@ package com.jim.melodyplayer.net;
  */
 public class SongListRequest {
     public String method="baidu.ting.billboard.billList";
-    public int type=1;
-    public int size=10;
-    public int offset=0;
+    public String type="1";
+    public String size="10";
+    public String offset="0";
 
-    public SongListRequest(String method, int type, int size, int offset) {
+    public SongListRequest(){}
+
+    public SongListRequest(String method, String type, String size, String offset) {
         this.method = method;
         this.type = type;
         this.size = size;
@@ -24,27 +26,27 @@ public class SongListRequest {
         this.method = method;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public int getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(String size) {
         this.size = size;
     }
 
-    public int getOffset() {
+    public String getOffset() {
         return offset;
     }
 
-    public void setOffset(int offset) {
+    public void setOffset(String offset) {
         this.offset = offset;
     }
 }

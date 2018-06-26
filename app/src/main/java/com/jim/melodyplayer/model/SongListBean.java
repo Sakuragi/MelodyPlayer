@@ -1,4 +1,4 @@
-package com.jim.melodyplayer.net;
+package com.jim.melodyplayer.model;
 
 import java.util.List;
 

@@ -1,11 +1,19 @@
 package com.jim.melodyplayer.net;
 
-import com.google.gson.Gson;
+import com.jim.melodyplayer.model.SonInfoBean;
+import com.jim.melodyplayer.model.SongListBean;
+import com.jim.melodyplayer.utils.LogUtil;
 
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.RequestBody;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -27,7 +35,7 @@ public class NetUtils {
             sRetrofit=new Retrofit.Builder()
                     .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                     .addConverterFactory(GsonConverterFactory.create())
-                    .baseUrl("http://tingapi.ting.baidu.com/v1")
+                    .baseUrl("http://tingapi.ting.baidu.com/v1/")
                     .client(getOkHttpClient())
                     .build();
         }
@@ -40,19 +48,42 @@ public class NetUtils {
                     .readTimeout(READ_TIME_OUT, TimeUnit.SECONDS)
                     .writeTimeout(WRITE_TIME_OUT,TimeUnit.SECONDS)
                     .connectTimeout(CONNECT_TIME_OUT,TimeUnit.SECONDS)
+                    .addInterceptor(new Interceptor() {
+                        @Override
+                        public Response intercept(Chain chain) throws IOException {
+                            LogUtil.d(chain.request().toString());
+                            Request request=chain.request().newBuilder()
+                                    .removeHeader("User-Agent")
+                                    .addHeader("User-Agent","Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4)")
+                                    .build() ;
+                            return chain.proceed(request);
+                        }
+                    })
                     .build();
         }
         return sOkHttpClient;
     }
 
-    private static RequestBody getRequestBody(Object obj) {
-        String route = new Gson().toJson(obj);
-        RequestBody body=RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"),route);
-        return body;
+    private static Map<String, String> getRequestMap(Object obj) {
+        Field[] fields=obj.getClass().getFields();
+        HashMap<String,String> map=new HashMap<>();
+        for (Field field:fields){
+            try {
+                map.put(field.getName(),field.get(obj)+"");
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return map;
     }
 
-    public static Observable<BaseResponse<SongListBean>> fetchSongList(SongListRequest request){
-        return getRetrofit().create(NetApi.class).fetchSongList(getRequestBody(request));
+    public static Observable<SongListBean> fetchSongList(SongListRequest request){
+        return getRetrofit().create(NetApi.class).fetchSongList(getRequestMap(request));
+    }
+
+    public static Observable<SonInfoBean> fetchSong(SongRequest request){
+        return getRetrofit().create(NetApi.class).fetchSong(getRequestMap(request));
     }
 
 }
