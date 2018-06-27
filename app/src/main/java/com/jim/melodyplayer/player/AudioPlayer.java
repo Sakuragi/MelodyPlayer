@@ -1,5 +1,6 @@
 package com.jim.melodyplayer.player;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
@@ -31,10 +32,12 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     private MediaPlayer mMediaPlayer;
     private MediaProxyServer mMediaProxy;
     private int mCurrentState = STATE_IDLE;
-    private Handler uiHandler;
+    private Handler uiHandler=new Handler();
     private AudioManager mAudioManager;
+    private Context mContext;
 
-    public AudioPlayer() {
+    public AudioPlayer(Context context) {
+        mContext=context;
         mMediaProxy = new MediaProxyServer();
         mMediaProxy.init();
         mMediaPlayer = new MediaPlayer();
@@ -80,6 +83,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     @Override
     public void play() {
         if (!mMediaPlayer.isPlaying() &&!isCanNotPlay()) {
+            mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
             int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                     AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
             if (status==AUDIOFOCUS_REQUEST_GRANTED){

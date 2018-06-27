@@ -16,7 +16,7 @@
         android:layout_weight="1"
         >
 
-        <ImageView
+        <com.jim.melodyplayer.ui.widget.ShadowImageView
             android:id="@+id/image_view_album"
             android:layout_width="@dimen/mp.music.album.size"
             android:layout_height="@dimen/mp.music.album.size"
