@@ -1,6 +1,6 @@
 package com.jim.melodyplayer.net;
 
-import com.jim.melodyplayer.model.SonInfoBean;
+import com.jim.melodyplayer.model.SongInfoBean;
 import com.jim.melodyplayer.model.SongListBean;
 import com.jim.melodyplayer.utils.LogUtil;
 
@@ -82,7 +82,7 @@ public class NetUtils {
         return getRetrofit().create(NetApi.class).fetchSongList(getRequestMap(request));
     }
 
-    public static Observable<SonInfoBean> fetchSong(SongRequest request){
+    public static Observable<SongInfoBean> fetchSong(SongRequest request){
         return getRetrofit().create(NetApi.class).fetchSong(getRequestMap(request));
     }
 

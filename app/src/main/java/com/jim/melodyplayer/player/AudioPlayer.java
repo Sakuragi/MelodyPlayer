@@ -71,7 +71,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         mMediaPlayer.setOnCompletionListener(this);
         mMediaPlayer.setOnErrorListener(this);
         try {
-            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.setDataSource(mMediaProxy.getProxyHostUrl(url));
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.prepareAsync();
             mCurrentState = STATE_PREPARING;

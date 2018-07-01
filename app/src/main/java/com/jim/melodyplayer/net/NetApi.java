@@ -1,6 +1,6 @@
 package com.jim.melodyplayer.net;
 
-import com.jim.melodyplayer.model.SonInfoBean;
+import com.jim.melodyplayer.model.SongInfoBean;
 import com.jim.melodyplayer.model.SongListBean;
 
 import java.util.Map;
@@ -18,6 +18,6 @@ public interface NetApi {
     Observable<SongListBean> fetchSongList(@QueryMap Map<String,String> map);
 
     @GET("restserver/ting")
-    Observable<SonInfoBean> fetchSong(@QueryMap Map<String,String> map);
+    Observable<SongInfoBean> fetchSong(@QueryMap Map<String,String> map);
 
 }

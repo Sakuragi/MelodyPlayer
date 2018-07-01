@@ -1,9 +1,14 @@
 package com.jim.melodyplayer.ui.activities;
 
 import android.app.Activity;
+import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
-import android.net.Uri;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
@@ -13,14 +18,15 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.jim.melodyplayer.R;
-import com.jim.melodyplayer.model.SonInfoBean;
-import com.jim.melodyplayer.model.SongListBean;
+import com.jim.melodyplayer.model.SongInfoBean;
 import com.jim.melodyplayer.net.NetUtils;
 import com.jim.melodyplayer.net.SongRequest;
 import com.jim.melodyplayer.player.AudioPlayer;
+import com.jim.melodyplayer.player.MediaPlayerService;
 import com.jim.melodyplayer.utils.LogUtil;
+
+import java.lang.ref.WeakReference;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -61,8 +67,21 @@ public class PlayingActivity extends AppCompatActivity {
     @BindView(R.id.layout_play_controls)
     LinearLayout mLayoutPlayControls;
     private String songId;
-    private AudioPlayer mAudioPlayer;
+    private MediaPlayerService mPlayerService;
     private String playUrl;
+    private Handler uiHandler=new UIHandler(this);
+
+    private ServiceConnection mServiceConnection=new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            mPlayerService= ((MediaPlayerService.LocalBinder) iBinder).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            mPlayerService=null;
+        }
+    };
 
     public static void start(int songId, Activity activity) {
         Intent i = new Intent(activity, PlayingActivity.class);
@@ -76,6 +95,7 @@ public class PlayingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music_playing);
         ButterKnife.bind(this);
         songId = getIntent().getIntExtra("song_id",0)+"";
+
         loadData();
     }
 
@@ -83,9 +103,8 @@ public class PlayingActivity extends AppCompatActivity {
     void doClick(View view){
         switch (view.getId()){
             case R.id.button_play_toggle:
-                mAudioPlayer=new AudioPlayer(PlayingActivity.this);
-                mAudioPlayer.open(playUrl);
-                mAudioPlayer.playOrPause();
+//                mAudioPlayer.open(playUrl);
+//                mAudioPlayer.playOrPause();
                 break;
             case R.id.button_play_next:
                 break;
@@ -100,17 +119,13 @@ public class PlayingActivity extends AppCompatActivity {
         NetUtils.fetchSong(songRequest)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(new Action1<SonInfoBean>() {
+                .subscribe(new Action1<SongInfoBean>() {
                     @Override
-                    public void call(SonInfoBean songListBean) {
-                        LogUtil.e(songListBean.getSonginfo().getArtist_1000_1000().split("@")[0]);
-                        mTextViewName.setText(songListBean.getSonginfo().getTitle());
-                        mTextViewArtist.setText(songListBean.getSonginfo().getCompose());
-                        playUrl=songListBean.getBitrate().getFile_link();
-//                        Glide.with(PlayingActivity.this)
-//                                .load("http://qukufile2.qianqian.com/data2/pic/246586325/246586325.jpg")
-//                                .into(mImageViewAlbum);
-//                        mImageViewAlbum.setImageURI(Uri.parse(songListBean.getSonginfo().getArtist_1000_1000().split("@")[0]));
+                    public void call(SongInfoBean songInfoBean) {
+                        LogUtil.e(songInfoBean.getSonginfo().getArtist_1000_1000().split("@")[0]);
+                        mTextViewName.setText(songInfoBean.getSonginfo().getTitle());
+                        mTextViewArtist.setText(songInfoBean.getSonginfo().getCompose());
+                        playUrl=songInfoBean.getBitrate().getFile_link();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -118,5 +133,19 @@ public class PlayingActivity extends AppCompatActivity {
 
                     }
                 });
+    }
+
+    static class UIHandler extends Handler{
+
+        private WeakReference<PlayingActivity> mActivity;
+
+        public UIHandler(PlayingActivity activity){
+            mActivity=new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+        }
     }
 }

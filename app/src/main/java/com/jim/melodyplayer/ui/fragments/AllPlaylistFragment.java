@@ -13,8 +13,8 @@ import com.jim.melodyplayer.R;
 import com.jim.melodyplayer.base.BaseRecyclerView;
 import com.jim.melodyplayer.base.BaseViewHolder;
 import com.jim.melodyplayer.base.CommonAdapter;
-import com.jim.melodyplayer.net.NetUtils;
 import com.jim.melodyplayer.model.SongListBean;
+import com.jim.melodyplayer.net.NetUtils;
 import com.jim.melodyplayer.net.SongListRequest;
 import com.jim.melodyplayer.ui.activities.PlayingActivity;
 
