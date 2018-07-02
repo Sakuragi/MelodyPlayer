@@ -104,7 +104,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         this.uiHandler = handler;
     }
 
-    private void play(SongInfoBean.BitrateEntity songInfo) {
+    public void play(SongInfoBean.BitrateEntity songInfo) {
         if (songInfo == null) {
             LogUtil.e("song info can not be null!");
             return;
@@ -122,7 +122,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         }
     }
 
-    private void playAll(List<SongInfoBean.BitrateEntity> songs, int index) {
+    public void playAll(List<SongInfoBean.BitrateEntity> songs, int index) {
         if (songs == null || songs.size() <= 0) {
             LogUtil.e("songs info can not be null!");
             return;
@@ -167,7 +167,23 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         }
     }
 
-    private void pause() {
+    public void playNext(){
+        if (playList!=null&&playList.size()>0&&mPosition<playList.size()-1){
+            mCurrentState=STATE_IDLE;
+            mPosition=mPosition+1;
+            play(playList.get(mPosition));
+        }
+    }
+
+    public void playPrev(){
+        if (playList!=null&&playList.size()>0&&mPosition>=1){
+            mCurrentState=STATE_IDLE;
+            mPosition=mPosition-1;
+            play(playList.get(mPosition));
+        }
+    }
+
+    public void pause() {
         if (mMediaPlayer.isPlaying()) {
             mMediaPlayer.pause();
             mCurrentState = STATE_PAUSED;
@@ -202,6 +218,10 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             return mMediaPlayer.getDuration();
         }
         return -1;
+    }
+
+    public boolean isPlaying(){
+        return mCurrentState==STATE_PLAYING;
     }
 
     private boolean isCanNotPlay() {

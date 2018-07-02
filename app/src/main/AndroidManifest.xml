@@ -19,7 +19,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.PlayingActivity"/>
+        <activity android:name=".ui.activities.PlayingActivity"
+            android:launchMode="singleInstance"/>
     </application>
 
 </manifest>

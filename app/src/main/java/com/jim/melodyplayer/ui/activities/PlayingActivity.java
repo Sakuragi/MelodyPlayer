@@ -69,7 +69,7 @@ public class PlayingActivity extends AppCompatActivity {
     LinearLayout mLayoutPlayControls;
     private String songId;
     private MediaPlayerService mPlayerService;
-    private String playUrl;
+    private SongInfoBean.BitrateEntity songInfo;
     private Handler uiHandler=new UIHandler(this);
 
     private ServiceConnection mServiceConnection=new ServiceConnection() {
@@ -105,12 +105,23 @@ public class PlayingActivity extends AppCompatActivity {
     void doClick(View view){
         switch (view.getId()){
             case R.id.button_play_toggle:
-                mPlayerService.playOrPause();
+                if (mPlayerService!=null){
+                    if (mPlayerService.isPlaying()){
+                        mPlayerService.pause();
+                    }else {
+                        mPlayerService.play(songInfo);
+                    }
+                }
                 break;
             case R.id.button_play_next:
-                mPlayerService.playOrPause();
+                if (mPlayerService!=null){
+                    mPlayerService.playNext();
+                }
                 break;
             case R.id.button_play_last:
+                if (mPlayerService!=null){
+                    mPlayerService.playPrev();
+                }
                 break;
         }
     }
@@ -127,7 +138,7 @@ public class PlayingActivity extends AppCompatActivity {
                         LogUtil.e(songInfoBean.getSonginfo().getArtist_1000_1000().split("@")[0]);
                         mTextViewName.setText(songInfoBean.getSonginfo().getTitle());
                         mTextViewArtist.setText(songInfoBean.getSonginfo().getCompose());
-                        playUrl=songInfoBean.getBitrate().getFile_link();
+                        songInfo=songInfoBean.getBitrate();
                     }
                 }, new Action1<Throwable>() {
                     @Override
