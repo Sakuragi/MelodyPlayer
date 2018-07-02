@@ -3,6 +3,7 @@ package com.jim.melodyplayer.ui.activities;
 import android.app.Activity;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
@@ -95,7 +96,8 @@ public class PlayingActivity extends AppCompatActivity {
         setContentView(R.layout.activity_music_playing);
         ButterKnife.bind(this);
         songId = getIntent().getIntExtra("song_id",0)+"";
-
+        Intent i=new Intent(PlayingActivity.this,MediaPlayerService.class);
+        bindService(i,mServiceConnection, Context.BIND_AUTO_CREATE);
         loadData();
     }
 
@@ -103,10 +105,10 @@ public class PlayingActivity extends AppCompatActivity {
     void doClick(View view){
         switch (view.getId()){
             case R.id.button_play_toggle:
-//                mAudioPlayer.open(playUrl);
-//                mAudioPlayer.playOrPause();
+                mPlayerService.playOrPause();
                 break;
             case R.id.button_play_next:
+                mPlayerService.playOrPause();
                 break;
             case R.id.button_play_last:
                 break;

@@ -15,41 +15,6 @@ public class MediaPlayerService extends Service implements Player{
     private AudioPlayer mPlayer;
     private final Binder mBinder = new LocalBinder();
 
-    @Override
-    public void open(String url) {
-        mPlayer.open(url);
-    }
-
-    @Override
-    public void play() {
-        mPlayer.playOrPause();
-    }
-
-    @Override
-    public void playOrPause() {
-        mPlayer.playOrPause();
-    }
-
-    @Override
-    public void seek(int position) {
-        mPlayer.seek(position);
-    }
-
-    @Override
-    public void stop() {
-        mPlayer.stop();
-    }
-
-    @Override
-    public void destroy() {
-
-    }
-
-    @Override
-    public long getDuration() {
-        return mPlayer.getDuration();
-    }
-
     public class LocalBinder extends Binder {
         public MediaPlayerService getService() {
             return MediaPlayerService.this;
@@ -66,7 +31,7 @@ public class MediaPlayerService extends Service implements Player{
     @Override
     public void onCreate() {
         super.onCreate();
-        mPlayer=new AudioPlayer(this);
+        mPlayer=AudioPlayer.getInstance(this);
     }
 
     @Override
