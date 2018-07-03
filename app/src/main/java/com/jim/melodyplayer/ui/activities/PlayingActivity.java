@@ -28,6 +28,8 @@ import com.jim.melodyplayer.player.MediaPlayerService;
 import com.jim.melodyplayer.utils.LogUtil;
 
 import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -35,6 +37,9 @@ import butterknife.OnClick;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+
+import static com.jim.melodyplayer.player.AudioPlayer.INIT_SEEK_BAR;
+import static com.jim.melodyplayer.player.AudioPlayer.UPDATE_SEEK_BAR;
 
 /**
  * Created by Jim on 2018/6/26.
@@ -148,6 +153,14 @@ public class PlayingActivity extends AppCompatActivity {
                 });
     }
 
+    public void initSeekBar(int duration){
+        mSeekBar.setMax(duration);
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
+        String hms = formatter.format(duration);
+        mTextViewDuration.setText(hms);
+    }
+
     static class UIHandler extends Handler{
 
         private WeakReference<PlayingActivity> mActivity;
@@ -158,7 +171,13 @@ public class PlayingActivity extends AppCompatActivity {
 
         @Override
         public void handleMessage(Message msg) {
-            super.handleMessage(msg);
+            switch (msg.what){
+                case INIT_SEEK_BAR:
+                    mActivity.get().initSeekBar(msg.arg1);
+                    break;
+                case UPDATE_SEEK_BAR:
+                    break;
+            }
         }
     }
 }

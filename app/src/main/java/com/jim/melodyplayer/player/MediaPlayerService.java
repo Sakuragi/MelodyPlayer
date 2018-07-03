@@ -70,6 +70,14 @@ public class MediaPlayerService extends Service implements Player{
         mPlayer.playPrev();
     }
 
+    public boolean hasNext(){
+        return mPlayer.hasNext();
+    }
+
+    public boolean hasPrev(){
+        return mPlayer.hasPrev();
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
