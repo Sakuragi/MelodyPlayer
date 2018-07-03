@@ -1,15 +1,12 @@
 package com.jim.melodyplayer.ui.activities;
 
 import android.app.Activity;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
@@ -23,11 +20,10 @@ import com.jim.melodyplayer.R;
 import com.jim.melodyplayer.model.SongInfoBean;
 import com.jim.melodyplayer.net.NetUtils;
 import com.jim.melodyplayer.net.SongRequest;
-import com.jim.melodyplayer.player.AudioPlayer;
 import com.jim.melodyplayer.player.MediaPlayerService;
+import com.jim.melodyplayer.player.PlayerCallBack;
 import com.jim.melodyplayer.utils.LogUtil;
 
-import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
@@ -38,13 +34,10 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
-import static com.jim.melodyplayer.player.AudioPlayer.INIT_SEEK_BAR;
-import static com.jim.melodyplayer.player.AudioPlayer.UPDATE_SEEK_BAR;
-
 /**
  * Created by Jim on 2018/6/26.
  */
-public class PlayingActivity extends AppCompatActivity {
+public class PlayingActivity extends AppCompatActivity implements PlayerCallBack {
 
     @BindView(R.id.image_view_album)
     ImageView mImageViewAlbum;
@@ -75,7 +68,6 @@ public class PlayingActivity extends AppCompatActivity {
     private String songId;
     private MediaPlayerService mPlayerService;
     private SongInfoBean.BitrateEntity songInfo;
-    private Handler uiHandler=new UIHandler(this);
 
     private ServiceConnection mServiceConnection=new ServiceConnection() {
         @Override
@@ -161,23 +153,40 @@ public class PlayingActivity extends AppCompatActivity {
         mTextViewDuration.setText(hms);
     }
 
-    static class UIHandler extends Handler{
+    @Override
+    public void updateBuffer(int percent) {
 
-        private WeakReference<PlayingActivity> mActivity;
-
-        public UIHandler(PlayingActivity activity){
-            mActivity=new WeakReference<>(activity);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case INIT_SEEK_BAR:
-                    mActivity.get().initSeekBar(msg.arg1);
-                    break;
-                case UPDATE_SEEK_BAR:
-                    break;
-            }
-        }
     }
+
+    @Override
+    public void onSwitchPrev(SongInfoBean.BitrateEntity song) {
+
+    }
+
+    @Override
+    public void onSwitchNext(SongInfoBean.BitrateEntity song) {
+
+    }
+
+    @Override
+    public void onComplete(SongInfoBean.BitrateEntity song) {
+
+    }
+
+    @Override
+    public void onPlayStateChanged(boolean isPlaying) {
+
+    }
+
+    @Override
+    public void onStatePaly(SongInfoBean.BitrateEntity song) {
+    }
+
+    @Override
+    public void onStateStop(SongInfoBean.BitrateEntity song) {
+
+    }
+
+
+
 }

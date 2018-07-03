@@ -1,4 +1,4 @@
-package com.jim.melodyplayer.player;
+package com.jim.melodyplayer.player.proxy;
 
 import android.text.TextUtils;
 import android.util.Log;

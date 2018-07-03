@@ -7,17 +7,15 @@ import android.os.Handler;
 import android.os.Message;
 
 import com.jim.melodyplayer.model.SongInfoBean;
+import com.jim.melodyplayer.player.proxy.MediaProxyServer;
 import com.jim.melodyplayer.utils.LogUtil;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import static android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
-import static com.jim.melodyplayer.ui.activities.MainActivity.INIT_SEEK_BAR;
 
 /**
  * Created by Jim on 2018/1/29 0029.
@@ -25,7 +23,7 @@ import static com.jim.melodyplayer.ui.activities.MainActivity.INIT_SEEK_BAR;
 
 public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         MediaPlayer.OnErrorListener, Player,
-        MediaPlayer.OnPreparedListener,MediaPlayer.OnBufferingUpdateListener {
+        MediaPlayer.OnPreparedListener, MediaPlayer.OnBufferingUpdateListener {
     private static final int STATE_ERROR = -1;
     private static final int STATE_IDLE = 0;
     private static final int STATE_PREPARING = 1;
@@ -41,10 +39,10 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     private MediaPlayer mMediaPlayer;
     private MediaProxyServer mMediaProxy;
     private int mCurrentState = STATE_IDLE;
-    private Handler uiHandler;
     private AudioManager mAudioManager;
     private WeakReference<Context> mContext;
     private ArrayList<SongInfoBean.BitrateEntity> playList;
+    private ArrayList<PlayerCallBack> mCallBacks;
     private static AudioPlayer sAudioPlayer;
     private int mPosition;
 
@@ -64,6 +62,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     private AudioPlayer(Context context) {
         mContext = new WeakReference<>(context);
         playList = new ArrayList<>();
+        mCallBacks = new ArrayList<>();
         mMediaProxy = new MediaProxyServer();
         mMediaProxy.init();
         mMediaPlayer = new MediaPlayer();
@@ -72,7 +71,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-
+        notifyComplete(playList.get(mPosition));
     }
 
     @Override
@@ -84,31 +83,10 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     public void onPrepared(MediaPlayer mp) {
         if (mCurrentState == STATE_PREPARING) {
             mCurrentState = STATE_PREPARED;
-            Message message=uiHandlerObtainMsg();
-            message.what=INIT_SEEK_BAR;
-            message.arg1=mMediaPlayer.getDuration();
-            notifyUi(message);
             startPlayer();
         }
     }
 
-    private void notifyUi(Message message) {
-        if (uiHandler == null || message == null) {
-            return;
-        }
-        uiHandler.sendMessage(message);
-    }
-
-    private Message uiHandlerObtainMsg() {
-        if (uiHandler != null) {
-            return uiHandler.obtainMessage();
-        }
-        return null;
-    }
-
-    public void setUiHandler(Handler handler) {
-        this.uiHandler = handler;
-    }
 
     public void play(SongInfoBean.BitrateEntity songInfo) {
         if (songInfo == null) {
@@ -118,6 +96,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         if (mCurrentState == STATE_PAUSED) {
             mMediaPlayer.start();
             mCurrentState = STATE_PLAYING;
+            notifyPlayStateChanged(true);
             return;
         }
         playList.add(songInfo);
@@ -136,6 +115,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         if (mCurrentState == STATE_PAUSED) {
             mMediaPlayer.start();
             mCurrentState = STATE_PLAYING;
+            notifyPlayStateChanged(true);
             return;
         }
         playList.addAll(songs);
@@ -154,12 +134,13 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         if (status == AUDIOFOCUS_REQUEST_GRANTED) {
             mMediaPlayer.start();
             mCurrentState = STATE_PLAYING;
+            notifyPlay(playList.get(mPosition));
         }
     }
 
 
     private void open(String url) {
-        LogUtil.i("open url: "+url);
+        LogUtil.i("open url: " + url);
         mMediaPlayer.reset();
         mCurrentState = STATE_IDLE;
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -181,6 +162,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             mCurrentState = STATE_IDLE;
             mPosition = mPosition + 1;
             play(playList.get(mPosition));
+            notifyPlayNext(playList.get(mPosition));
         }
     }
 
@@ -189,6 +171,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             mCurrentState = STATE_IDLE;
             mPosition = mPosition - 1;
             play(playList.get(mPosition));
+            notifyPlayPrev(playList.get(mPosition));
         }
     }
 
@@ -197,6 +180,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             mMediaPlayer.pause();
             mCurrentState = STATE_PAUSED;
             mAudioManager.abandonAudioFocus(mAudioFocusListener);
+            notifyPlayStateChanged(false);
         }
     }
 
@@ -212,6 +196,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             mMediaPlayer.stop();
             mMediaPlayer.reset();
             mCurrentState = STATE_IDLE;
+            notifyStop(playList.get(mPosition));
         }
     }
 
@@ -220,6 +205,10 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             mMediaPlayer.release();
             mCurrentState = STATE_IDLE;
         }
+    }
+
+    public void registerCallBack(PlayerCallBack callBack) {
+        mCallBacks.add(callBack);
     }
 
     public boolean hasNext() {
@@ -256,6 +245,51 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     @Override
     public void onBufferingUpdate(MediaPlayer mp, int percent) {
-
+        notifyBufferUpdate(percent);
     }
+
+
+    private void notifyBufferUpdate(int percent) {
+        for (PlayerCallBack callBack : mCallBacks) {
+            callBack.updateBuffer(percent);
+        }
+    }
+
+    private void notifyPlayPrev(SongInfoBean.BitrateEntity song) {
+        for (PlayerCallBack callback : mCallBacks) {
+            callback.onSwitchPrev(song);
+        }
+    }
+
+    private void notifyPlayNext(SongInfoBean.BitrateEntity song) {
+        for (PlayerCallBack callback : mCallBacks) {
+            callback.onSwitchNext(song);
+        }
+    }
+
+    private void notifyComplete(SongInfoBean.BitrateEntity song) {
+        for (PlayerCallBack callback : mCallBacks) {
+            callback.onComplete(song);
+        }
+    }
+
+    private void notifyPlayStateChanged(boolean isPlaying) {
+        for (PlayerCallBack callback : mCallBacks) {
+            callback.onPlayStateChanged(isPlaying);
+        }
+    }
+
+    private void notifyPlay(SongInfoBean.BitrateEntity song) {
+        for (PlayerCallBack callback : mCallBacks) {
+            callback.onStatePaly(song);
+        }
+    }
+
+    private void notifyStop(SongInfoBean.BitrateEntity song) {
+        for (PlayerCallBack callback : mCallBacks) {
+            callback.onStateStop(song);
+        }
+    }
+
+
 }
