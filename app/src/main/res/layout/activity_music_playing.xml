@@ -106,7 +106,7 @@
             android:id="@+id/button_play_mode_toggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_play_mode_shuffle"
+            app:srcCompat="@drawable/play_btn_shuffle_selector"
             android:background="?attr/selectableItemBackgroundBorderless"
             />
 
@@ -114,7 +114,7 @@
             android:id="@+id/button_play_last"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_play_last"
+            app:srcCompat="@drawable/play_btn_prev_selector"
             android:background="?attr/selectableItemBackgroundBorderless"
             />
 
@@ -122,7 +122,7 @@
             android:id="@+id/button_play_toggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_play"
+            app:srcCompat="@drawable/play_btn_play_pause_selector"
             android:background="?attr/selectableItemBackgroundBorderless"
             />
 
@@ -130,7 +130,7 @@
             android:id="@+id/button_play_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_play_next"
+            app:srcCompat="@drawable/play_btn_next_selector"
             android:background="?attr/selectableItemBackgroundBorderless"
             />
 
@@ -141,6 +141,6 @@
             android:scaleType="center"
             app:srcCompat="@drawable/ic_favorite_no"
             android:background="?attr/selectableItemBackgroundBorderless"
-            />
+            tools:ignore="VectorDrawableCompat"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.jim.melodyplayer.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -8,12 +9,14 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.util.TimeUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jim.melodyplayer.R;
@@ -37,7 +40,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by Jim on 2018/6/26.
  */
-public class PlayingActivity extends AppCompatActivity implements PlayerCallBack {
+public class PlayingActivity extends AppCompatActivity implements PlayerCallBack, SeekBar.OnSeekBarChangeListener {
 
     @BindView(R.id.image_view_album)
     ImageView mImageViewAlbum;
@@ -68,16 +71,18 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
     private String songId;
     private MediaPlayerService mPlayerService;
     private SongInfoBean.BitrateEntity songInfo;
+    private Runnable progressRunnable;
 
-    private ServiceConnection mServiceConnection=new ServiceConnection() {
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            mPlayerService= ((MediaPlayerService.LocalBinder) iBinder).getService();
+            mPlayerService = ((MediaPlayerService.LocalBinder) iBinder).getService();
+            mPlayerService.registerCallBack(PlayingActivity.this);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
-            mPlayerService=null;
+            mPlayerService = null;
         }
     };
 
@@ -92,31 +97,36 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_playing);
         ButterKnife.bind(this);
-        songId = getIntent().getIntExtra("song_id",0)+"";
-        Intent i=new Intent(PlayingActivity.this,MediaPlayerService.class);
-        bindService(i,mServiceConnection, Context.BIND_AUTO_CREATE);
+        init();
         loadData();
     }
 
-    @OnClick({R.id.button_play_toggle,R.id.button_play_next,R.id.button_play_last})
-    void doClick(View view){
-        switch (view.getId()){
+    private void init() {
+        songId = getIntent().getIntExtra("song_id", 0) + "";
+        Intent i = new Intent(PlayingActivity.this, MediaPlayerService.class);
+        bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
+        mSeekBar.setOnSeekBarChangeListener(this);
+    }
+
+    @OnClick({R.id.button_play_toggle, R.id.button_play_next, R.id.button_play_last})
+    void doClick(View view) {
+        switch (view.getId()) {
             case R.id.button_play_toggle:
-                if (mPlayerService!=null){
-                    if (mPlayerService.isPlaying()){
+                if (mPlayerService != null) {
+                    if (mPlayerService.isPlaying()) {
                         mPlayerService.pause();
-                    }else {
+                    } else {
                         mPlayerService.play(songInfo);
                     }
                 }
                 break;
             case R.id.button_play_next:
-                if (mPlayerService!=null){
+                if (mPlayerService != null) {
                     mPlayerService.playNext();
                 }
                 break;
             case R.id.button_play_last:
-                if (mPlayerService!=null){
+                if (mPlayerService != null) {
                     mPlayerService.playPrev();
                 }
                 break;
@@ -135,7 +145,9 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
                         LogUtil.e(songInfoBean.getSonginfo().getArtist_1000_1000().split("@")[0]);
                         mTextViewName.setText(songInfoBean.getSonginfo().getTitle());
                         mTextViewArtist.setText(songInfoBean.getSonginfo().getCompose());
-                        songInfo=songInfoBean.getBitrate();
+                        songInfo = songInfoBean.getBitrate();
+                        mTextViewDuration.setText(formatDuration(songInfo.getFile_duration()));
+                        mButtonPlayToggle.performClick();
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -145,17 +157,10 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
                 });
     }
 
-    public void initSeekBar(int duration){
-        mSeekBar.setMax(duration);
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
-        formatter.setTimeZone(TimeZone.getTimeZone("GMT+00:00"));
-        String hms = formatter.format(duration);
-        mTextViewDuration.setText(hms);
-    }
 
     @Override
     public void updateBuffer(int percent) {
-
+        LogUtil.i("update buffer percent: " + percent);
     }
 
     @Override
@@ -169,17 +174,26 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
     }
 
     @Override
-    public void onComplete(SongInfoBean.BitrateEntity song) {
-
+    public void onComplete() {
+        mSeekBar.setProgress(0);
+        mTextViewProgress.setText(formatDuration(0));
+        mButtonPlayToggle.setSelected(false);
+        mPlayerService.seek(0);
+        mPlayerService.stop();
     }
 
     @Override
     public void onPlayStateChanged(boolean isPlaying) {
-
+        if (isPlaying) {
+            mButtonPlayToggle.setSelected(true);
+        } else {
+            mButtonPlayToggle.setSelected(false);
+        }
     }
 
     @Override
-    public void onStatePaly(SongInfoBean.BitrateEntity song) {
+    public void onStatePlay(SongInfoBean.BitrateEntity song) {
+        mButtonPlayToggle.setSelected(true);
     }
 
     @Override
@@ -187,6 +201,45 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
 
     }
 
+    //进度条回调更新
+    @Override
+    public void onProgressUpdate(int progress) {
+        LogUtil.d("progress: " + progress + " duration: " + mPlayerService.getCurrentSong().getFile_duration());
+        float seekBarProgress = (float) progress / mPlayerService.getCurrentSong().getFile_duration() * mSeekBar.getMax();
+        LogUtil.d("seekbar progress: " + seekBarProgress);
+        mSeekBar.setProgress((int) seekBarProgress);
+        mTextViewProgress.setText(formatDuration(progress));
+    }
 
 
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (fromUser) {
+            int targetDuration = (int) (songInfo.getFile_duration() * ((float) progress / mSeekBar.getMax()));
+            mTextViewProgress.setText(formatDuration(targetDuration));
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+        int position = (int) (songInfo.getFile_duration() * ((float) seekBar.getProgress() / mSeekBar.getMax()));
+        mPlayerService.seek(position * 1000);
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static String formatDuration(int duration) {
+        int minute = duration / 60;
+        int hour = minute / 60;
+        minute %= 60;
+        int second = duration % 60;
+        if (hour != 0)
+            return String.format("%2d:%02d:%02d", hour, minute, second);
+        else
+            return String.format("%02d:%02d", minute, second);
+    }
 }

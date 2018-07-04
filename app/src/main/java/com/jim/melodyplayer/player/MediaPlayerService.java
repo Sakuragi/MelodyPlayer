@@ -7,6 +7,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.jim.melodyplayer.model.SongInfoBean;
+import com.jim.melodyplayer.utils.LogUtil;
 
 import java.util.List;
 
@@ -35,7 +36,7 @@ public class MediaPlayerService extends Service implements Player,PlayerCallBack
     }
 
     @Override
-    public void onComplete(SongInfoBean.BitrateEntity song) {
+    public void onComplete() {
 
     }
 
@@ -45,12 +46,18 @@ public class MediaPlayerService extends Service implements Player,PlayerCallBack
     }
 
     @Override
-    public void onStatePaly(SongInfoBean.BitrateEntity song) {
+    public void onStatePlay(SongInfoBean.BitrateEntity song) {
+
+    }
+
+
+    @Override
+    public void onStateStop(SongInfoBean.BitrateEntity song) {
 
     }
 
     @Override
-    public void onStateStop(SongInfoBean.BitrateEntity song) {
+    public void onProgressUpdate(int progress) {
 
     }
 
@@ -83,6 +90,14 @@ public class MediaPlayerService extends Service implements Player,PlayerCallBack
 
     public void destroy() {
         mPlayer.destroy();
+    }
+
+    public int getCurrentProgress(){
+        return mPlayer.getCurrentProgress();
+    }
+
+    public SongInfoBean.BitrateEntity getCurrentSong(){
+        return mPlayer.getCurrentSong();
     }
 
     public long getDuration() {
@@ -122,6 +137,7 @@ public class MediaPlayerService extends Service implements Player,PlayerCallBack
     @Override
     public void onCreate() {
         super.onCreate();
+        LogUtil.d("onCreate");
         mPlayer=AudioPlayer.getInstance(this);
         mPlayer.registerCallBack(this);
     }

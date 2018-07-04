@@ -12,11 +12,13 @@ public interface PlayerCallBack {
 
     void onSwitchNext(SongInfoBean.BitrateEntity song);
 
-    void onComplete(SongInfoBean.BitrateEntity song);
+    void onComplete();
 
     void onPlayStateChanged(boolean isPlaying);
 
-    void onStatePaly(SongInfoBean.BitrateEntity song);
+    void onStatePlay(SongInfoBean.BitrateEntity song);
 
     void onStateStop(SongInfoBean.BitrateEntity song);
+
+    void onProgressUpdate(int progress);
 }

@@ -21,6 +21,7 @@
         </activity>
         <activity android:name=".ui.activities.PlayingActivity"
             android:launchMode="singleInstance"/>
+        <service android:name=".player.MediaPlayerService"/>
     </application>
 
 </manifest>
