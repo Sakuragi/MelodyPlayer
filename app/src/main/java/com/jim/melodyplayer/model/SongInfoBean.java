@@ -949,6 +949,8 @@ public class SongInfoBean {
         private int file_bitrate;
         private String file_link;
         private int original;
+        public String author;
+        public String title;
 
         public String getShow_link() {
             return show_link;

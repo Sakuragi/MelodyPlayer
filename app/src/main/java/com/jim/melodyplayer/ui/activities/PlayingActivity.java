@@ -143,9 +143,11 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
                     @Override
                     public void call(SongInfoBean songInfoBean) {
                         LogUtil.e(songInfoBean.getSonginfo().getArtist_1000_1000().split("@")[0]);
-                        mTextViewName.setText(songInfoBean.getSonginfo().getTitle());
-                        mTextViewArtist.setText(songInfoBean.getSonginfo().getCompose());
                         songInfo = songInfoBean.getBitrate();
+                        songInfo.author=songInfoBean.getSonginfo().getAuthor();
+                        songInfo.title=songInfoBean.getSonginfo().getTitle();
+                        mTextViewName.setText(songInfo.title);
+                        mTextViewArtist.setText(songInfo.author);
                         mTextViewDuration.setText(formatDuration(songInfo.getFile_duration()));
                         mButtonPlayToggle.performClick();
                     }
@@ -165,12 +167,16 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
 
     @Override
     public void onSwitchPrev(SongInfoBean.BitrateEntity song) {
-
+        mTextViewName.setText(song.title);
+        mTextViewArtist.setText(song.author);
+        mTextViewDuration.setText(formatDuration(song.getFile_duration()));
     }
 
     @Override
     public void onSwitchNext(SongInfoBean.BitrateEntity song) {
-
+        mTextViewName.setText(song.title);
+        mTextViewArtist.setText(song.author);
+        mTextViewDuration.setText(formatDuration(song.getFile_duration()));
     }
 
     @Override
