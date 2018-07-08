@@ -49,7 +49,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     private static AudioPlayer sAudioPlayer;
     private int mPosition;
     private Handler mHandler = new Handler(Looper.getMainLooper());
-    private PlayMode mPlayMode = PlayMode.LOOP;
+    private PlayMode mPlayMode;
 
     public void setPlayMode(PlayMode playMode) {
         mPlayMode = playMode;
@@ -85,6 +85,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         mMediaProxy.init();
         mMediaPlayer = new MediaPlayer();
         mPosition = 0;
+        mAudioManager = (AudioManager) mContext.get().getSystemService(Context.AUDIO_SERVICE);
     }
 
     @Override
@@ -117,7 +118,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         play();
     }
 
-    private void play() {
+    public void play() {
         if (playList == null || playList.size() <= 0) {
             LogUtil.e("song list can not be null!");
             return;
@@ -148,7 +149,6 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     private void startPlayer() {
         LogUtil.i("startPlayer");
-        mAudioManager = (AudioManager) mContext.get().getSystemService(Context.AUDIO_SERVICE);
         int status = mAudioManager.requestAudioFocus(mAudioFocusListener,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         if (status == AUDIOFOCUS_REQUEST_GRANTED) {
@@ -181,14 +181,12 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     public void playNext() {
         LogUtil.d("playNext()");
         if (playList != null && playList.size() > 0) {
+            if (mPlayMode==null) mPlayMode=PlayMode.getCurrentMode();
             switch (mPlayMode) {
                 case LIST:
                 case LOOP:
-                    if (mPosition >= playList.size() - 1) {
-                        mPosition = 0;
-                    } else {
-                        mPosition += 1;
-                    }
+                    mPosition += 1;
+                    mPosition=mPosition%playList.size();
                     break;
                 case SINGLE:
                     break;
@@ -204,6 +202,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     public void playPrev() {
         if (playList != null && playList.size() > 0) {
+            if (mPlayMode==null) mPlayMode=PlayMode.getCurrentMode();
             switch (mPlayMode) {
                 case LIST:
                 case LOOP:
@@ -226,10 +225,11 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     }
 
     private int randomIndex() {
-        int rondomIndex = new Random(playList.size()).nextInt();
+        int rondomIndex = new Random().nextInt(playList.size());
         if (rondomIndex == mPosition) {
             randomIndex();
         }
+        LogUtil.i("random index: "+rondomIndex+" index: "+rondomIndex);
         return rondomIndex;
     }
 
@@ -277,6 +277,10 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     public void registerCallBack(PlayerCallBack callBack) {
         mCallBacks.add(callBack);
+    }
+
+    public void unRegisterCallBack(PlayerCallBack callBack){
+        mCallBacks.remove(callBack);
     }
 
     public boolean hasNext() {

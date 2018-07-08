@@ -3,6 +3,7 @@
              android:id="@+id/fl_play_bar"
              android:layout_width="match_parent"
              android:layout_height="@dimen/play_bar_height"
+             android:clickable="true"
              android:background="#3C5F88">
 
     <LinearLayout

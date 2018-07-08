@@ -1,15 +1,15 @@
-package com.yidianling.zj.android.utils;
+package com.jim.melodyplayer.utils;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.yidianling.zj.android.application.MyApplication;
+import com.jim.melodyplayer.app.App;
 
 
 public class SharedPreferencesEditor {
 
-	private static final String app_sharedPreference_name = "yidianling_zj";
+	private static final String app_sharedPreference_name = "melody_player";
 	private static final String user_info = "user_info";
 	public static final String first_start = "first_start";
 	public static final String TEMP_TEST = "temp_test";//临时SP
@@ -17,7 +17,7 @@ public class SharedPreferencesEditor {
 	/********************************************自定义文件存储***********************************************/
 
 	public static void putFileString(String fileName,String key,String value) {
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				fileName, Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = mySharedPreferences.edit();
 		editor.putString(key, value);
@@ -25,7 +25,7 @@ public class SharedPreferencesEditor {
 	}
 
 	public static String getFileString(String fileName,String key) {
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				fileName, Activity.MODE_PRIVATE);
 		return mySharedPreferences.getString(key, "");
 	}
@@ -45,7 +45,7 @@ public class SharedPreferencesEditor {
 	}
 
 	public static void putString(String key, String value) {
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				TEMP_TEST, Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = mySharedPreferences.edit();
 		editor.putString(key, value);
@@ -53,13 +53,19 @@ public class SharedPreferencesEditor {
 	}
 
 	public static String getString(String key){
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				TEMP_TEST, Activity.MODE_PRIVATE);
 		return mySharedPreferences.getString(key, "");
 	}
 
+	public static String getString(String key,String defVaule){
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
+				TEMP_TEST, Activity.MODE_PRIVATE);
+		return mySharedPreferences.getString(key, defVaule);
+	}
+
 	public static void putBoolean(String key, boolean value) {
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				TEMP_TEST, Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = mySharedPreferences.edit();
 		editor.putBoolean(key, value);
@@ -67,7 +73,7 @@ public class SharedPreferencesEditor {
 	}
 
 	public static void putInt(String key, int value) {
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				TEMP_TEST, Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = mySharedPreferences.edit();
 		editor.putInt(key, value);
@@ -75,13 +81,13 @@ public class SharedPreferencesEditor {
 	}
 
 	public static boolean getBoolean(String key) {
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				TEMP_TEST, Activity.MODE_PRIVATE);
 		return mySharedPreferences.getBoolean(key, false);
 	}
 
 	public static int getInt(String key){
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				TEMP_TEST, Activity.MODE_PRIVATE);
 		return mySharedPreferences.getInt(key, 0);
 	}
@@ -137,7 +143,7 @@ public class SharedPreferencesEditor {
 	}
 
 	public static final void clear(){
-		SharedPreferences mySharedPreferences = MyApplication.getMyApplication().getSharedPreferences(
+		SharedPreferences mySharedPreferences = App.app.getSharedPreferences(
 				app_sharedPreference_name, Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = mySharedPreferences.edit();
 		editor.clear();

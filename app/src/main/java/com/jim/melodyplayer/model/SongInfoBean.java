@@ -951,6 +951,7 @@ public class SongInfoBean {
         private int original;
         public String author;
         public String title;
+        public String cover;
 
         public String getShow_link() {
             return show_link;

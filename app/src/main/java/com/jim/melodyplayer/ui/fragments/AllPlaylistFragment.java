@@ -17,6 +17,7 @@ import com.jim.melodyplayer.model.SongListBean;
 import com.jim.melodyplayer.net.NetUtils;
 import com.jim.melodyplayer.net.SongListRequest;
 import com.jim.melodyplayer.ui.activities.PlayingActivity;
+import com.jim.melodyplayer.utils.LogUtil;
 
 import java.util.ArrayList;
 
@@ -78,6 +79,11 @@ public class AllPlaylistFragment extends Fragment {
                     @Override
                     public void call(SongListBean songListBeanBaseResponse) {
                         mCommonAdapter.addDatas(songListBeanBaseResponse.getSong_list());
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        LogUtil.e("load list error: "+throwable.toString());
                     }
                 });
     }

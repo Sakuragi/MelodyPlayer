@@ -106,7 +106,7 @@
             android:id="@+id/button_play_mode_toggle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/play_btn_shuffle_selector"
+            android:src="@drawable/ic_play_mode_list"
             android:background="?attr/selectableItemBackgroundBorderless"
             />
 

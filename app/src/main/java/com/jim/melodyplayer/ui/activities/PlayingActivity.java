@@ -6,6 +6,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -19,6 +20,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.jim.melodyplayer.R;
+import com.jim.melodyplayer.app.App;
 import com.jim.melodyplayer.model.SongInfoBean;
 import com.jim.melodyplayer.net.NetUtils;
 import com.jim.melodyplayer.net.SongRequest;
@@ -26,6 +28,7 @@ import com.jim.melodyplayer.player.MediaPlayerService;
 import com.jim.melodyplayer.player.PlayMode;
 import com.jim.melodyplayer.player.PlayerCallBack;
 import com.jim.melodyplayer.utils.LogUtil;
+import com.jim.melodyplayer.utils.SharedPreferencesEditor;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,7 +42,7 @@ import static com.jim.melodyplayer.player.PlayMode.LIST;
 /**
  * Created by Jim on 2018/6/26.
  */
-public class PlayingActivity extends AppCompatActivity implements PlayerCallBack, SeekBar.OnSeekBarChangeListener {
+public class PlayingActivity extends AppCompatActivity implements App.ServiceBindCallBack, PlayerCallBack, SeekBar.OnSeekBarChangeListener {
 
     @BindView(R.id.image_view_album)
     ImageView mImageViewAlbum;
@@ -76,15 +79,16 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             mPlayerService = ((MediaPlayerService.LocalBinder) iBinder).getService();
+            mPlayerService.setPlayMode(PlayMode.getCurrentMode());
             mPlayerService.registerCallBack(PlayingActivity.this);
         }
 
         @Override
         public void onServiceDisconnected(ComponentName componentName) {
+            LogUtil.i("onServiceDisconnected");
             mPlayerService = null;
         }
     };
-    private PlayMode playMode;
 
     public static void start(int songId, Activity activity) {
         Intent i = new Intent(activity, PlayingActivity.class);
@@ -92,24 +96,26 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
         activity.startActivity(i);
     }
 
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_playing);
         LogUtil.i("onCreate");
         ButterKnife.bind(this);
+        mPlayerService = App.app.getPlayerService();
         init();
         loadData();
     }
 
     private void init() {
+        updatePlayMode(PlayMode.getCurrentMode());
         songId = getIntent().getIntExtra("song_id", 0) + "";
         Intent i = new Intent(PlayingActivity.this, MediaPlayerService.class);
-        bindService(i, mServiceConnection, Context.BIND_AUTO_CREATE);
         mSeekBar.setOnSeekBarChangeListener(this);
     }
 
-    @OnClick({R.id.button_play_mode_toggle,R.id.button_play_toggle, R.id.button_play_next, R.id.button_play_last})
+    @OnClick({R.id.button_play_mode_toggle, R.id.button_play_toggle, R.id.button_play_next, R.id.button_play_last})
     void doClick(View view) {
         switch (view.getId()) {
             case R.id.button_play_toggle:
@@ -133,22 +139,17 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
                 break;
             case R.id.button_play_mode_toggle:
                 if (mPlayerService == null) return;
-
-                PlayMode current = PlayMode.SHUFFLE;
+                PlayMode current = PlayMode.getCurrentMode();
                 PlayMode newMode = PlayMode.switchNextMode(current);
                 mPlayerService.setPlayMode(newMode);
+                PlayMode.setPlayMode(newMode);
                 updatePlayMode(newMode);
                 break;
         }
     }
 
     private void updatePlayMode(PlayMode newMode) {
-        if (newMode == null) {
-            playMode = PlayMode.defaultMode();
-        }else {
-            playMode=newMode;
-        }
-        switch (playMode) {
+        switch (newMode) {
             case LIST:
                 mButtonPlayModeToggle.setImageResource(R.drawable.ic_play_mode_list);
                 break;
@@ -165,6 +166,14 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
     }
 
     private void loadData() {
+        if (songId.equals("0") && mPlayerService.isPlaying()) {
+            mButtonPlayToggle.setSelected(true);
+            mTextViewName.setText(mPlayerService.getCurrentSong().title);
+            mTextViewArtist.setText(mPlayerService.getCurrentSong().author);
+            mTextViewDuration.setText(formatDuration(mPlayerService.getCurrentSong().getFile_duration()));
+            mTextViewProgress.setText(formatDuration(mPlayerService.getCurrentProgress()));
+            return;
+        }
         SongRequest songRequest = new SongRequest();
         songRequest.songid = songId;
         NetUtils.fetchSong(songRequest)
@@ -175,8 +184,9 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
                     public void call(SongInfoBean songInfoBean) {
                         LogUtil.e(songInfoBean.getSonginfo().getArtist_1000_1000().split("@")[0]);
                         songInfo = songInfoBean.getBitrate();
-                        songInfo.author=songInfoBean.getSonginfo().getAuthor();
-                        songInfo.title=songInfoBean.getSonginfo().getTitle();
+                        songInfo.author = songInfoBean.getSonginfo().getAuthor();
+                        songInfo.title = songInfoBean.getSonginfo().getTitle();
+//                        songInfo.cover=songInfoBean.getSonginfo().
                         mTextViewName.setText(songInfo.title);
                         mTextViewArtist.setText(songInfo.author);
                         mTextViewDuration.setText(formatDuration(songInfo.getFile_duration()));
@@ -217,7 +227,7 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
         mTextViewProgress.setText(formatDuration(0));
         mButtonPlayToggle.setSelected(false);
         mPlayerService.seek(0);
-        mPlayerService.stop();
+//        mPlayerService.stop();
     }
 
     @Override
@@ -278,5 +288,30 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
             return String.format("%2d:%02d:%02d", hour, minute, second);
         else
             return String.format("%02d:%02d", minute, second);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (checkNotNull(mPlayerService)) {
+            mPlayerService.unRegisterCallBack(this);
+        }
+    }
+
+    public boolean checkNotNull(Object... objects) {
+        for (Object obj : objects) {
+            if (obj == null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public void onServiceBind() {
+        if (mPlayerService == null) {
+            mPlayerService.setPlayMode(PlayMode.getCurrentMode());
+            mPlayerService.registerCallBack(PlayingActivity.this);
+        }
     }
 }

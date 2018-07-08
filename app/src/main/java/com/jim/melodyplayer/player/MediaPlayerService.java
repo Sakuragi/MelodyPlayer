@@ -72,6 +72,10 @@ public class MediaPlayerService extends Service implements Player,PlayerCallBack
         mPlayer.play(songInfo);
     }
 
+    public void play(){
+        mPlayer.play();
+    }
+
     public void playAll(List<SongInfoBean.BitrateEntity> songs, int index){
         mPlayer.playAll(songs,index);
     }
@@ -130,6 +134,10 @@ public class MediaPlayerService extends Service implements Player,PlayerCallBack
 
     public void registerCallBack(PlayerCallBack callBack){
         mPlayer.registerCallBack(callBack);
+    }
+
+    public void unRegisterCallBack(PlayerCallBack callBack){
+        mPlayer.unRegisterCallBack(callBack);
     }
 
     @Nullable
