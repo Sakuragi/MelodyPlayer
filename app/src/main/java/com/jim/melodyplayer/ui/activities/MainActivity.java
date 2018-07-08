@@ -38,7 +38,7 @@ import butterknife.ButterKnife;
 import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity implements PlayerCallBack,App.ServiceBindCallBack {
+public class MainActivity extends AppCompatActivity implements PlayerCallBack, App.ServiceBindCallBack {
 
     @BindView(R.id.radio_button_play_list)
     RadioButton mRadioButtonPlayList;
@@ -102,8 +102,9 @@ public class MainActivity extends AppCompatActivity implements PlayerCallBack,Ap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        App.app.registerBindCallBack(this);
         mPlayerService = App.app.getPlayerService();
-        if (mPlayerService!=null){
+        if (mPlayerService != null) {
             mPlayerService.registerCallBack(MainActivity.this);
             mPlayerService.setPlayMode(PlayMode.getCurrentMode());
         }
@@ -244,7 +245,8 @@ public class MainActivity extends AppCompatActivity implements PlayerCallBack,Ap
 
     @Override
     public void onServiceBind() {
-        if (mPlayerService==null){
+        if (mPlayerService == null) {
+            mPlayerService=App.app.getPlayerService();
             mPlayerService.registerCallBack(MainActivity.this);
             mPlayerService.setPlayMode(PlayMode.getCurrentMode());
         }

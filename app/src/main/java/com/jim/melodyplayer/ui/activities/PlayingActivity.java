@@ -103,7 +103,12 @@ public class PlayingActivity extends AppCompatActivity implements App.ServiceBin
         setContentView(R.layout.activity_music_playing);
         LogUtil.i("onCreate");
         ButterKnife.bind(this);
+        App.app.registerBindCallBack(this);
         mPlayerService = App.app.getPlayerService();
+        if (mPlayerService!=null){
+            mPlayerService.setPlayMode(PlayMode.getCurrentMode());
+            mPlayerService.registerCallBack(PlayingActivity.this);
+        }
         init();
         loadData();
     }
@@ -310,6 +315,7 @@ public class PlayingActivity extends AppCompatActivity implements App.ServiceBin
     @Override
     public void onServiceBind() {
         if (mPlayerService == null) {
+            mPlayerService=App.app.getPlayerService();
             mPlayerService.setPlayMode(PlayMode.getCurrentMode());
             mPlayerService.registerCallBack(PlayingActivity.this);
         }
