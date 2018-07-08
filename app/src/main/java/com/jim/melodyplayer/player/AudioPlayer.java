@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static android.media.AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
 
@@ -48,6 +49,12 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     private static AudioPlayer sAudioPlayer;
     private int mPosition;
     private Handler mHandler = new Handler(Looper.getMainLooper());
+    private PlayMode mPlayMode = PlayMode.LOOP;
+
+    public void setPlayMode(PlayMode playMode) {
+        mPlayMode = playMode;
+    }
+
     private Runnable progressUpdateRunnable = new Runnable() {
         @Override
         public void run() {
@@ -82,9 +89,9 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (hasNext()){
+        if (hasNext()) {
             playNext();
-        }else {
+        } else {
             notifyComplete();
         }
     }
@@ -104,9 +111,15 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
 
     public void play(SongInfoBean.BitrateEntity songInfo) {
-        LogUtil.i("playAll song: " + songInfo);
-        if (songInfo == null) {
-            LogUtil.e("song info can not be null!");
+        LogUtil.i("play song: " + songInfo);
+        playList.add(songInfo);
+        mPosition = playList.size() - 1;
+        play();
+    }
+
+    private void play() {
+        if (playList == null || playList.size() <= 0) {
+            LogUtil.e("song list can not be null!");
             return;
         }
         if (mCurrentState == STATE_PAUSED) {
@@ -116,9 +129,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             notifyPlayStateChanged(true);
             return;
         }
-        playList.add(songInfo);
-        mPosition = playList.size() - 1;
-        open(songInfo.getFile_link());
+        open(playList.get(mPosition).getFile_link());
         if (!mMediaPlayer.isPlaying() && !isCanNotPlay()) {
             startPlayer();
         }
@@ -130,18 +141,9 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             LogUtil.e("songs info can not be null!");
             return;
         }
-        if (mCurrentState == STATE_PAUSED) {
-            mMediaPlayer.start();
-            mCurrentState = STATE_PLAYING;
-            notifyPlayStateChanged(true);
-            return;
-        }
         playList.addAll(songs);
         mPosition = index;
-        open(songs.get(index).getFile_link());
-        if (!mMediaPlayer.isPlaying() && !isCanNotPlay()) {
-            startPlayer();
-        }
+        play();
     }
 
     private void startPlayer() {
@@ -178,21 +180,57 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     public void playNext() {
         LogUtil.d("playNext()");
-        if (playList != null && playList.size() > 0 && mPosition < playList.size() - 1) {
+        if (playList != null && playList.size() > 0) {
+            switch (mPlayMode) {
+                case LIST:
+                case LOOP:
+                    if (mPosition >= playList.size() - 1) {
+                        mPosition = 0;
+                    } else {
+                        mPosition += 1;
+                    }
+                    break;
+                case SINGLE:
+                    break;
+                case SHUFFLE:
+                    mPosition = randomIndex();
+                    break;
+            }
             mCurrentState = STATE_IDLE;
-            mPosition = mPosition + 1;
-            play(playList.get(mPosition));
+            play();
             notifyPlayNext(playList.get(mPosition));
         }
     }
 
     public void playPrev() {
-        if (playList != null && playList.size() > 0 && mPosition >= 1) {
+        if (playList != null && playList.size() > 0) {
+            switch (mPlayMode) {
+                case LIST:
+                case LOOP:
+                    if (mPosition <= 0) {
+                        mPosition = playList.size() - 1;
+                    } else {
+                        mPosition -= 1;
+                    }
+                    break;
+                case SINGLE:
+                    break;
+                case SHUFFLE:
+                    mPosition = randomIndex();
+                    break;
+            }
             mCurrentState = STATE_IDLE;
-            mPosition = mPosition - 1;
-            play(playList.get(mPosition));
+            play();
             notifyPlayPrev(playList.get(mPosition));
         }
+    }
+
+    private int randomIndex() {
+        int rondomIndex = new Random(playList.size()).nextInt();
+        if (rondomIndex == mPosition) {
+            randomIndex();
+        }
+        return rondomIndex;
     }
 
     public void pause() {
@@ -212,7 +250,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
             if (position < getDuration()) {
                 mMediaPlayer.seekTo(position);
                 LogUtil.i("seek position smaller than duration");
-            }else {
+            } else {
                 onCompletion(mMediaPlayer);
                 LogUtil.i("seek postion is larger than duration");
             }
@@ -222,7 +260,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     public void stop() {
         if (mCurrentState != STATE_IDLE) {
             mMediaPlayer.stop();
-            mMediaPlayer.reset();
+            mMediaPlayer.release();
             mCurrentState = STATE_IDLE;
             notifyStop(playList.get(mPosition));
             mHandler.removeCallbacks(progressUpdateRunnable);

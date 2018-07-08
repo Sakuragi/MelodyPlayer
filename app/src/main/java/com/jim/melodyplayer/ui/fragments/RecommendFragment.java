@@ -4,9 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +15,6 @@ import com.jim.melodyplayer.base.BaseViewHolder;
 import com.jim.melodyplayer.base.CommonAdapter;
 import com.jim.melodyplayer.model.Banner;
 import com.jim.melodyplayer.ui.LoodView;
-import com.jim.melodyplayer.ui.widget.LoopView;
 
 import java.util.ArrayList;
 import java.util.List;
