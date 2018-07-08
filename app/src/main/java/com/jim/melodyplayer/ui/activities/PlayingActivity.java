@@ -9,7 +9,6 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.support.v4.util.TimeUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.AppCompatSeekBar;
@@ -24,11 +23,9 @@ import com.jim.melodyplayer.model.SongInfoBean;
 import com.jim.melodyplayer.net.NetUtils;
 import com.jim.melodyplayer.net.SongRequest;
 import com.jim.melodyplayer.player.MediaPlayerService;
+import com.jim.melodyplayer.player.PlayMode;
 import com.jim.melodyplayer.player.PlayerCallBack;
 import com.jim.melodyplayer.utils.LogUtil;
-
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -36,6 +33,8 @@ import butterknife.OnClick;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
+
+import static com.jim.melodyplayer.player.PlayMode.LIST;
 
 /**
  * Created by Jim on 2018/6/26.
@@ -85,6 +84,7 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
             mPlayerService = null;
         }
     };
+    private PlayMode playMode;
 
     public static void start(int songId, Activity activity) {
         Intent i = new Intent(activity, PlayingActivity.class);
@@ -96,6 +96,7 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_playing);
+        LogUtil.i("onCreate");
         ButterKnife.bind(this);
         init();
         loadData();
@@ -108,7 +109,7 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
         mSeekBar.setOnSeekBarChangeListener(this);
     }
 
-    @OnClick({R.id.button_play_toggle, R.id.button_play_next, R.id.button_play_last})
+    @OnClick({R.id.button_play_mode_toggle,R.id.button_play_toggle, R.id.button_play_next, R.id.button_play_last})
     void doClick(View view) {
         switch (view.getId()) {
             case R.id.button_play_toggle:
@@ -130,6 +131,36 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
                     mPlayerService.playPrev();
                 }
                 break;
+            case R.id.button_play_mode_toggle:
+                if (mPlayerService == null) return;
+
+                PlayMode current = PlayMode.SHUFFLE;
+                PlayMode newMode = PlayMode.switchNextMode(current);
+                mPlayerService.setPlayMode(newMode);
+                updatePlayMode(newMode);
+                break;
+        }
+    }
+
+    private void updatePlayMode(PlayMode newMode) {
+        if (newMode == null) {
+            playMode = PlayMode.defaultMode();
+        }else {
+            playMode=newMode;
+        }
+        switch (playMode) {
+            case LIST:
+                mButtonPlayModeToggle.setImageResource(R.drawable.ic_play_mode_list);
+                break;
+            case LOOP:
+                mButtonPlayModeToggle.setImageResource(R.drawable.ic_play_mode_loop);
+                break;
+            case SHUFFLE:
+                mButtonPlayModeToggle.setImageResource(R.drawable.ic_play_mode_shuffle);
+                break;
+            case SINGLE:
+                mButtonPlayModeToggle.setImageResource(R.drawable.ic_play_mode_single);
+                break;
         }
     }
 
@@ -143,11 +174,13 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
                     @Override
                     public void call(SongInfoBean songInfoBean) {
                         LogUtil.e(songInfoBean.getSonginfo().getArtist_1000_1000().split("@")[0]);
-                        mTextViewName.setText(songInfoBean.getSonginfo().getTitle());
-                        mTextViewArtist.setText(songInfoBean.getSonginfo().getCompose());
                         songInfo = songInfoBean.getBitrate();
+                        songInfo.author=songInfoBean.getSonginfo().getAuthor();
+                        songInfo.title=songInfoBean.getSonginfo().getTitle();
+                        mTextViewName.setText(songInfo.author);
+                        mTextViewArtist.setText(songInfo.title);
                         mTextViewDuration.setText(formatDuration(songInfo.getFile_duration()));
-                        mButtonPlayToggle.performClick();
+                        mPlayerService.play(songInfo);
                     }
                 }, new Action1<Throwable>() {
                     @Override
@@ -165,12 +198,18 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
 
     @Override
     public void onSwitchPrev(SongInfoBean.BitrateEntity song) {
-
+        LogUtil.i("onSwitchPrev");
+        mTextViewName.setText(song.author);
+        mTextViewArtist.setText(song.title);
+        mTextViewDuration.setText(formatDuration(song.getFile_duration()));
     }
 
     @Override
     public void onSwitchNext(SongInfoBean.BitrateEntity song) {
-
+        LogUtil.i("onSwitchNext");
+        mTextViewName.setText(song.author);
+        mTextViewArtist.setText(song.title);
+        mTextViewDuration.setText(formatDuration(song.getFile_duration()));
     }
 
     @Override
@@ -198,7 +237,6 @@ public class PlayingActivity extends AppCompatActivity implements PlayerCallBack
 
     @Override
     public void onStateStop(SongInfoBean.BitrateEntity song) {
-
     }
 
     //进度条回调更新

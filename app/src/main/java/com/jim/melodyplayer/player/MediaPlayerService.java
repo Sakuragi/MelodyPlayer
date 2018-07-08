@@ -108,6 +108,10 @@ public class MediaPlayerService extends Service implements Player,PlayerCallBack
         return mPlayer.isPlaying();
     }
 
+    public void setPlayMode(PlayMode playMode){
+        mPlayer.setPlayMode(playMode);
+    }
+
     public void playNext(){
         mPlayer.playNext();
     }
