@@ -43,6 +43,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        LogUtil.i("onCreate");
         mCallBacks=new ArrayList<>();
         app=this;
         bindService(new Intent(this,MediaPlayerService.class),mServiceConnection,Context.BIND_AUTO_CREATE);

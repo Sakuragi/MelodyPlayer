@@ -81,8 +81,10 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         mContext = new WeakReference<>(context);
         playList = new ArrayList<>();
         mCallBacks = new ArrayList<>();
-        mMediaProxy = new MediaProxyServer();
-        mMediaProxy.init();
+        if (mMediaProxy==null){
+            mMediaProxy = new MediaProxyServer();
+//            mMediaProxy.init();
+        }
         mMediaPlayer = new MediaPlayer();
         mPosition = 0;
         mAudioManager = (AudioManager) mContext.get().getSystemService(Context.AUDIO_SERVICE);
@@ -169,7 +171,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         mMediaPlayer.setOnBufferingUpdateListener(this);
         mMediaPlayer.setOnErrorListener(this);
         try {
-            mMediaPlayer.setDataSource(url);
+            mMediaPlayer.setDataSource(mMediaProxy.getProxyHostUrl(url));
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.prepareAsync();
             mCurrentState = STATE_PREPARING;

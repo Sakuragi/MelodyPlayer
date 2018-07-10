@@ -200,7 +200,7 @@ public class PlayingActivity extends AppCompatActivity implements App.ServiceBin
                 }, new Action1<Throwable>() {
                     @Override
                     public void call(Throwable throwable) {
-
+                        LogUtil.e(throwable.toString());
                     }
                 });
     }

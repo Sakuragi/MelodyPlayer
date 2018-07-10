@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
 
 public class Request {
 
-    public static final int READ_TIME_OUT = 60000;
-    public static final int CONNECT_OUT = 60000;
+    public static final int READ_TIME_OUT = 240000;
+    public static final int CONNECT_OUT = 240000;
     public final static String HOST = "Host";
     public final static String RANGE = "Range";
     public final static String RANGE_PARAMS = "bytes=";
@@ -114,6 +114,7 @@ public class Request {
             urlConnection.setRequestProperty(name, value);
         }
         urlConnection.setRequestProperty(RANGE, RANGE_PARAMS + offset + "-");
+        urlConnection.setRequestProperty("Connection",  "close");
         return urlConnection;
     }
 
