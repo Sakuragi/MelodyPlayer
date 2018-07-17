@@ -5,8 +5,8 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 
+import com.danikula.videocache.HttpProxyCacheServer;
 import com.jim.melodyplayer.model.SongInfoBean;
 import com.jim.melodyplayer.player.proxy.MediaProxyServer;
 import com.jim.melodyplayer.utils.LogUtil;
@@ -50,6 +50,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     private int mPosition;
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private PlayMode mPlayMode;
+    private HttpProxyCacheServer mServer;
 
     public void setPlayMode(PlayMode playMode) {
         mPlayMode = playMode;
@@ -81,11 +82,12 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         mContext = new WeakReference<>(context);
         playList = new ArrayList<>();
         mCallBacks = new ArrayList<>();
-        if (mMediaProxy==null){
+//        mServer= App.getProxy(mContext.get());
+        if (mMediaProxy == null) {
             mMediaProxy = new MediaProxyServer();
-//            mMediaProxy.init();
         }
         mMediaPlayer = new MediaPlayer();
+        mPlayMode = PlayMode.getCurrentMode();
         mPosition = 0;
         mAudioManager = (AudioManager) mContext.get().getSystemService(Context.AUDIO_SERVICE);
     }
@@ -165,12 +167,12 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     private void open(String url) {
         LogUtil.i("open url: " + url);
         mMediaPlayer.reset();
-        mCurrentState = STATE_IDLE;
         mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         mMediaPlayer.setOnCompletionListener(this);
         mMediaPlayer.setOnBufferingUpdateListener(this);
         mMediaPlayer.setOnErrorListener(this);
         try {
+//            LogUtil.d("proy url: "+mServer.getProxyUrl(url));
             mMediaPlayer.setDataSource(mMediaProxy.getProxyHostUrl(url));
             mMediaPlayer.setOnPreparedListener(this);
             mMediaPlayer.prepareAsync();
@@ -183,12 +185,12 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
     public void playNext() {
         LogUtil.d("playNext()");
         if (playList != null && playList.size() > 0) {
-            if (mPlayMode==null) mPlayMode=PlayMode.getCurrentMode();
+            if (mPlayMode == null) mPlayMode = PlayMode.getCurrentMode();
             switch (mPlayMode) {
                 case LIST:
                 case LOOP:
                     mPosition += 1;
-                    mPosition=mPosition%playList.size();
+                    mPosition = mPosition % playList.size();
                     break;
                 case SINGLE:
                     break;
@@ -196,7 +198,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
                     mPosition = randomIndex();
                     break;
             }
-            mCurrentState = STATE_IDLE;
+            clearState();
             play();
             notifyPlayNext(playList.get(mPosition));
         }
@@ -204,7 +206,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
 
     public void playPrev() {
         if (playList != null && playList.size() > 0) {
-            if (mPlayMode==null) mPlayMode=PlayMode.getCurrentMode();
+            if (mPlayMode == null) mPlayMode = PlayMode.getCurrentMode();
             switch (mPlayMode) {
                 case LIST:
                 case LOOP:
@@ -220,7 +222,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
                     mPosition = randomIndex();
                     break;
             }
-            mCurrentState = STATE_IDLE;
+            clearState();
             play();
             notifyPlayPrev(playList.get(mPosition));
         }
@@ -231,7 +233,7 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         if (rondomIndex == mPosition) {
             randomIndex();
         }
-        LogUtil.i("random index: "+rondomIndex+" index: "+rondomIndex);
+        LogUtil.i("random index: " + rondomIndex + " index: " + rondomIndex);
         return rondomIndex;
     }
 
@@ -269,6 +271,10 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         }
     }
 
+    private void clearState(){
+        mCurrentState=STATE_IDLE;
+    }
+
     public void destroy() {
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
@@ -281,12 +287,18 @@ public class AudioPlayer implements MediaPlayer.OnCompletionListener,
         mCallBacks.add(callBack);
     }
 
-    public void unRegisterCallBack(PlayerCallBack callBack){
+    public void unRegisterCallBack(PlayerCallBack callBack) {
         mCallBacks.remove(callBack);
     }
 
     public boolean hasNext() {
-        return mPosition < playList.size() - 1;
+        if (mPlayMode == PlayMode.SINGLE) {
+            return true;
+        } else if (mPlayMode == PlayMode.LOOP || mPlayMode == PlayMode.LIST||mPlayMode == PlayMode.SHUFFLE) {
+            return playList != null && playList.size() > 0;
+        } else {
+            return mPosition < playList.size() - 1;
+        }
     }
 
     public boolean hasPrev() {

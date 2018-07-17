@@ -231,7 +231,7 @@ public class PlayingActivity extends AppCompatActivity implements App.ServiceBin
         mSeekBar.setProgress(0);
         mTextViewProgress.setText(formatDuration(0));
         mButtonPlayToggle.setSelected(false);
-        mPlayerService.seek(0);
+        mPlayerService.seek(-1);
 //        mPlayerService.stop();
     }
 

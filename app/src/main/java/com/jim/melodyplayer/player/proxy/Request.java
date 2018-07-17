@@ -2,18 +2,23 @@ package com.jim.melodyplayer.player.proxy;
 
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.TimeUtils;
 
 
 import com.jim.melodyplayer.utils.LogUtil;
 import com.jim.melodyplayer.utils.Util;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.lang.String.format;
 
 /**
  * Created by Jim on 2018/4/26.
@@ -37,6 +42,9 @@ public class Request {
     private String request;
     int redirectCount = 0;
     private boolean canUseCache;
+    private String mime;
+
+    private int contentLengthValue;
 
     public Request(String request) {
         this.request = request;
@@ -69,7 +77,7 @@ public class Request {
         if (requestUrl.startsWith("/")) {
             requestUrl = requestUrl.substring(1);
         }
-        Log.d(TAG, "method: " + method + " url: " + requestUrl);
+        LogUtil.i(TAG, "method: " + method + " url: " + requestUrl);
     }
 
     public URLConnection openConnection() throws IOException {
@@ -77,12 +85,12 @@ public class Request {
         HttpURLConnection urlConnection = null;
         String url = requestUrl;
         if (TextUtils.isEmpty(url)) {
-            Log.d(TAG, "request url can not be null!");
+            LogUtil.i(TAG, "request url can not be null!");
         }
-        LogUtil.d("url: "+requestUrl);
+        LogUtil.d("url: " + requestUrl);
         boolean redirect;
         do {
-            urlConnection = (HttpURLConnection) openRealConnection(url,offset);
+            urlConnection = (HttpURLConnection) openRealConnection(url, offset);
             int code = urlConnection.getResponseCode();
             redirect = code == HTTP_301 || code == HTTP_302;
             if (redirect) {
@@ -97,7 +105,7 @@ public class Request {
         return urlConnection;
     }
 
-    private URLConnection openRealConnection(String requestUrl,long offset) throws IOException {
+    private URLConnection openRealConnection(String requestUrl, long offset) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) new URL(requestUrl).openConnection();
         urlConnection.setRequestMethod(method);
         urlConnection.setConnectTimeout(CONNECT_OUT);
@@ -110,11 +118,10 @@ public class Request {
                 continue;
             }
             String value = requestParts[i].substring(separatorLocation + 1).trim();
-            Log.d(TAG, "name: " + name + " value: " + value);
+            LogUtil.i(TAG, "name: " + name + " value: " + value);
             urlConnection.setRequestProperty(name, value);
         }
         urlConnection.setRequestProperty(RANGE, RANGE_PARAMS + offset + "-");
-        urlConnection.setRequestProperty("Connection",  "close");
         return urlConnection;
     }
 
@@ -122,14 +129,52 @@ public class Request {
         return canUseCache;
     }
 
-    public int getContentLength(){
+
+    private void getContentInfo() {
+        HttpURLConnection urlConnection = null;
         try {
-            HttpURLConnection urlConnection= (HttpURLConnection) openRealConnection(requestUrl,0);
-            return urlConnection.getContentLength();
+            urlConnection = (HttpURLConnection) openRealConnection(requestUrl, 0);
+            mime = urlConnection.getContentType();
+            contentLengthValue = urlConnection.getContentLength();
         } catch (IOException e) {
             e.printStackTrace();
-            return -1;
+        } finally {
+            if (urlConnection != null) urlConnection.disconnect();
         }
     }
 
+
+    public String getResponseHeaders() throws IOException {
+        String mime = getMime();
+        boolean mimeKnown = !TextUtils.isEmpty(mime);
+        FileCache cacheFile = FileCache.open(requestUrl);
+        long length = cacheFile.isCompleted() ? cacheFile.available() : getContentLengthValue();
+        boolean lengthKnown = length >= 0;
+        long contentLength = isCanUseCache() ? length : length - offset;
+        boolean addRange = lengthKnown && !canUseCache;
+        String headers = new StringBuilder()
+                .append(isCanUseCache() ? "HTTP/1.1 206 PARTIAL CONTENT\n" : "HTTP/1.1 200 OK\n")
+                .append("Accept-Ranges: bytes\n")
+                .append(lengthKnown ? format("Content-Length: %d\n", contentLength) : "")
+                .append(addRange ? format("Content-Range: bytes %d-%d/%d\n", offset, length - 1, length) : "")
+                .append(mimeKnown ? format("Content-Type: %s\n", mime) : "")
+                .append("\n") // headers end
+                .toString();
+        LogUtil.i("header:  " + headers);
+        return headers;
+    }
+
+    public String getMime() {
+        if (TextUtils.isEmpty(mime)) {
+            getContentInfo();
+        }
+        return mime;
+    }
+
+    public int getContentLengthValue() {
+        if (contentLengthValue == 0) {
+            getContentInfo();
+        }
+        return contentLengthValue;
+    }
 }
